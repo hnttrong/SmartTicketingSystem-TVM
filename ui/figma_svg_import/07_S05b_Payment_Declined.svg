@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800">
+  <title>07_S05b_Payment_Declined</title>
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#003E7E"/>
+      <stop offset="55%" stop-color="#0267A6"/>
+      <stop offset="100%" stop-color="#00A8B5"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#001833" flood-opacity="0.18"/>
+    </filter>
+    </defs>
+  <rect id="Background" width="1280" height="800" fill="url(#bgGrad)"/>
+  
+    <circle id="Decor_TopRight" cx="1090" cy="40" r="210" fill="#FFFFFF" fill-opacity="0.06"/>
+    <circle id="Decor_BottomLeft" cx="140" cy="670" r="240" fill="#FFFFFF" fill-opacity="0.06"/>
+    
+
+  <!-- Header Bar R(0, 0, 1280, 84) in MainForm.cs -->
+  <g id="Top_Header_Bar">
+    <rect x="0" y="0" width="1280" height="84" fill="#06234B" fill-opacity="0.78"/>
+    <line x1="0" y1="83" x2="1280" y2="83" stroke="#FFFFFF" stroke-opacity="0.22" stroke-width="1"/>
+    <g id="Metro_Badge">
+      <rect x="28" y="14" width="56" height="56" rx="14" fill="#00A8B5"/>
+      <text x="56" y="49" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700" fill="#FFFFFF" text-anchor="middle">M1</text>
+    </g>
+    <text id="Header_Title" x="100" y="38" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="700" fill="#FFFFFF">Giao thông Thông minh TP.HCM • Tuyến Metro Số 1</text>
+    <text id="Header_Subtitle" x="100" y="64" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="600" fill="#C8EBFA">Ga đi: Bến Thành • Máy bán vé tự động TVM-BT-01</text>
+    <g id="Btn_Language_Toggle">
+      <rect x="824" y="10" width="170" height="64" rx="14" fill="#FFFFFF" fill-opacity="0.16" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="2"/>
+      <text x="909" y="48" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">🌐 VI / EN</text>
+    </g>
+    <g id="Btn_Accessibility_Toggle">
+      <rect x="1008" y="10" width="244" height="64" rx="14" fill="#FFFFFF" fill-opacity="0.16" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="2"/>
+      <text x="1130" y="48" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle">♿ Chữ lớn / Tương phản</text>
+    </g>
+  </g>
+
+  <!-- StepProgressBar R(28, 94, 1224, 58) in MainForm.cs -->
+  <g id="Progress_Stepper_Bar">
+    <rect x="28" y="94" width="1224" height="58" rx="14" fill="#FFFFFF" fill-opacity="0.86" stroke="#FFFFFF" stroke-width="1.5"/>
+    <g id="Step_1">
+      <circle cx="65" cy="123" r="15" fill="#1B7F3B"/>
+      <text x="65" y="128" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">✓</text>
+      <text x="90" y="129" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#0F223D">1. Điểm đến</text>
+    </g>
+    <line x1="296" y1="123" x2="326" y2="123" stroke="#1B7F3B" stroke-width="2"/>
+    <g id="Step_2">
+      <circle cx="371" cy="123" r="15" fill="#1B7F3B"/>
+      <text x="371" y="128" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">✓</text>
+      <text x="396" y="129" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#0F223D">2. Phương thức</text>
+    </g>
+    <line x1="602" y1="123" x2="632" y2="123" stroke="#1B7F3B" stroke-width="2"/>
+    <g id="Step_3">
+      <circle cx="677" cy="123" r="15" fill="#0A4988"/>
+      <text x="677" y="128" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+      <text x="702" y="129" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#0A4988">3. Thanh toán</text>
+    </g>
+    <line x1="908" y1="123" x2="938" y2="123" stroke="#C3D0E0" stroke-width="2"/>
+    <g id="Step_4">
+      <circle cx="983" cy="123" r="15" fill="#DCE4F0"/>
+      <text x="983" y="128" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#4E6178" text-anchor="middle">4</text>
+      <text x="1008" y="129" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#4E6178">4. Nhận vé</text>
+    </g>
+  </g>
+  <rect id="S05b_Declined_Card" x="28" y="162" width="1224" height="536" rx="24" fill="#FFFFFF" fill-opacity="0.86" stroke="#FFFFFF" stroke-width="1.5" filter="url(#cardShadow)"/>
+
+  <text id="S05b_Title" x="62" y="242" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="700" fill="#C2272D">⚠ Thanh toán Không Thành công (Từ chối)</text>
+  <text id="S05b_Reason_1" x="62" y="310" font-family="Segoe UI, Arial, sans-serif" font-size="20" fill="#0F223D">Ngân hàng phát hành hoặc Ví điện tử đã từ chối giao dịch</text>
+  <text id="S05b_Reason_2" x="62" y="344" font-family="Segoe UI, Arial, sans-serif" font-size="20" fill="#0F223D">(Mã lỗi: DECLINED_BY_ISSUER — Không đủ số dư hoặc vượt hạn mức).</text>
+
+  <g id="S05b_No_Charge_Assurance_Banner">
+    <rect x="62" y="418" width="1156" height="102" rx="12" fill="#E8F8EE"/>
+    <text x="640" y="478" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="700" fill="#1B7F3B" text-anchor="middle">✓ TÀI KHOẢN CỦA QUÝ KHÁCH CHƯA BỊ TRỪ TIỀN (0 VND)</text>
+  </g>
+  <g id="Btn_S05b_Cancel_To_Home">
+    <rect x="28" y="712" width="300" height="70" rx="16" fill="#FFF5F5" stroke="#C2272D" stroke-width="2"/>
+    <text x="178" y="754" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700" fill="#C2272D" text-anchor="middle">✕ Hủy &amp; Về Trang chủ</text>
+  </g>
+  <g id="Btn_S05b_Retry_Payment">
+    <rect x="812" y="712" width="440" height="70" rx="16" fill="#0A4988" stroke="#0A4988" stroke-width="0"/>
+    <text x="1032" y="754" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#FFFFFF" text-anchor="middle">↻ Chọn Phương thức Khác (Thử lại)</text>
+  </g>
+</svg>

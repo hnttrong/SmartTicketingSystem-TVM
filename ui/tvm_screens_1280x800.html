@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1400, initial-scale=1.0" />
+  <title>HCMC Metro TVM – 1280x800 Glassmorphism Wireframes (S01–S08)</title>
+  <style>
+    /* =========================================================================
+       DESIGN TOKENS (TASK 1a – GLASSMORPHISM KIOSK SYSTEM @ 1280x800)
+       ========================================================================= */
+    :root {
+      --bg-grad-start: #0B3D91;
+      --bg-grad-mid:   #126FA3;
+      --bg-grad-end:   #1AA6B7;
+
+      --glass-light:        rgba(255, 255, 255, 0.66);
+      --glass-light-strong: rgba(255, 255, 255, 0.78);
+      --glass-dark:         rgba(11, 42, 92, 0.80);
+      --glass-border:       rgba(255, 255, 255, 0.40);
+      --glass-blur:         20px;
+      --glass-shadow:       0 8px 32px rgba(0, 0, 0, 0.18);
+
+      --text-on-light:      #0B2A5C;
+      --text-muted-light:   #1E3F73;
+      --text-on-dark:       #FFFFFF;
+
+      --btn-primary-bg:     #0B3D91;
+      --btn-primary-press:  #072963;
+      --btn-secondary-bg:   rgba(255, 255, 255, 0.75);
+      --btn-cancel-bg:      rgba(255, 255, 255, 0.85);
+
+      --color-success:      #1B7F3B;
+      --color-success-bg:   rgba(27, 127, 59, 0.14);
+      --color-error:        #B3261E;
+      --color-error-bg:     rgba(179, 38, 30, 0.14);
+      --color-warning:      #9A5B00;
+
+      --radius-panel:       24px;
+      --radius-card:        20px;
+      --radius-btn:         16px;
+
+      --font-family:        'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --fs-h1:              48px;
+      --fs-h2:              40px;
+      --fs-body:            24px;
+      --fs-body-lg:         28px;
+      --touch-min:          64px;
+    }
+
+    /* High-Contrast + Large-Text Accessibility Override */
+    #kiosk-viewport.a11y-mode {
+      --glass-light:        rgba(255, 255, 255, 0.96);
+      --glass-light-strong: #FFFFFF;
+      --glass-dark:         #061A3A;
+      --glass-border:       #0B2A5C;
+      --text-on-light:      #04142E;
+      --text-muted-light:   #0B2A5C;
+      --btn-primary-bg:     #062966;
+      --btn-secondary-bg:   #FFFFFF;
+      --btn-cancel-bg:      #FFF5F5;
+      --fs-h1:              52px;
+      --fs-h2:              44px;
+      --fs-body:            26px;
+      --fs-body-lg:         30px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background: #0F172A;
+      color: #F8FAFC;
+      font-family: var(--font-family);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      gap: 14px;
+    }
+
+    /* =========================================================================
+       STUDIO PREVIEW TOOLBAR (OUTSIDE THE 1280x800 KIOSK FRAME FOR SCREENSHOTS)
+       ========================================================================= */
+    .studio-toolbar {
+      width: 1280px;
+      background: #1E293B;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .studio-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .studio-btns button, .studio-controls select, .studio-controls button {
+      background: #334155;
+      color: #F8FAFC;
+      border: 1px solid #475569;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .studio-btns button.active {
+      background: #1AA6B7;
+      border-color: #67E8F9;
+      color: #041E2B;
+    }
+    .studio-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* =========================================================================
+       EXACT 1280 x 800 KIOSK VIEWPORT
+       Right-click #kiosk-viewport in Chrome/Edge Inspect -> "Capture node screenshot"
+       for pixel-exact 1280x800 PNGs for Report Section 4.1!
+       ========================================================================= */
+    #kiosk-viewport {
+      width: 1280px;
+      height: 800px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-mid) 52%, var(--bg-grad-end) 100%);
+      font-family: var(--font-family);
+      color: var(--text-on-light);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Abstract Blurred Metro Station Ambient Shapes */
+    .ambient-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(56px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 { width: 520px; height: 520px; background: rgba(56, 189, 248, 0.34); top: -140px; right: -80px; }
+    .orb-2 { width: 460px; height: 460px; background: rgba(20, 184, 166, 0.30); bottom: -150px; left: 80px; }
+    .orb-3 { width: 340px; height: 340px; background: rgba(255, 255, 255, 0.16); top: 240px; left: 480px; }
+    .metro-grid-lines {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 64px 64px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* =========================================================================
+       PERSISTENT TOP BAR (88px) & 4-STEP PROGRESS BAR (64px)
+       ========================================================================= */
+    .kiosk-header {
+      position: relative;
+      z-index: 2;
+      height: 88px;
+      padding: 12px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--glass-dark);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border-bottom: 1px solid var(--glass-border);
+      color: var(--text-on-dark);
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .brand-badge {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: #1AA6B7;
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(255,255,255,0.65);
+    }
+    .brand-titles .title-main {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+    .brand-titles .title-sub {
+      font-size: 20px;
+      opacity: 0.92;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .util-btn {
+      min-height: 64px;
+      padding: 0 20px;
+      border-radius: 14px;
+      border: 2px solid rgba(255, 255, 255, 0.65);
+      background: rgba(255, 255, 255, 0.14);
+      color: #FFFFFF;
+      font-size: 24px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.12s ease, background 0.15s ease;
+    }
+    .util-btn.active {
+      background: #FFFFFF;
+      color: #0B2A5C;
+      border-color: #FFFFFF;
+    }
+
+    /* 4-Step Progress Bar */
+    .progress-strip {
+      position: relative;
+      z-index: 2;
+      height: 68px;
+      margin: 12px 28px 0 28px;
+      padding: 0 24px;
+      background: var(--glass-light);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      box-shadow: var(--glass-shadow);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      align-items: center;
+      gap: 12px;
+    }
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-muted-light);
+      opacity: 0.72;
+    }
+    .step-num {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 2px solid var(--text-on-light);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .step-item.active {
+      color: var(--btn-primary-bg);
+      opacity: 1;
+    }
+    .step-item.active .step-num {
+      background: var(--btn-primary-bg);
+      border-color: var(--btn-primary-bg);
+      color: #FFFFFF;
+    }
+    .step-item.done {
+      color: var(--color-success);
+      opacity: 1;
+    }
+    .step-item.done .step-num {
+      background: var(--color-success);
+      border-color: var(--color-success);
+      color: #FFFFFF;
+    }
+
+    /* =========================================================================
+       SCREEN CONTAINER & FROSTED GLASS PANELS
+       ========================================================================= */
+    .screen {
+      display: none;
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      padding: 16px 28px 20px 28px;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .screen.active {
+      display: flex;
+    }
+
+    .glass-panel {
+      background: var(--glass-light);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-panel);
+      box-shadow: var(--glass-shadow);
+      padding: 20px 24px;
+      color: var(--text-on-light);
+    }
+
+    .glass-panel-strong {
+      background: var(--glass-light-strong);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-panel);
+      box-shadow: var(--glass-shadow);
+      padding: 22px 26px;
+      color: var(--text-on-light);
+    }
+
+    h1.kiosk-h1 {
+      font-size: var(--fs-h1);
+      line-height: 1.12;
+      font-weight: 800;
+      color: var(--text-on-light);
+    }
+    h2.kiosk-h2 {
+      font-size: var(--fs-h2);
+      line-height: 1.15;
+      font-weight: 800;
+      color: var(--text-on-light);
+    }
+    p.kiosk-body, .kiosk-body {
+      font-size: var(--fs-body);
+      line-height: 1.32;
+      font-weight: 500;
+      color: var(--text-on-light);
+    }
+
+    /* =========================================================================
+       TOUCH BUTTONS (MIN HEIGHT >= 64px, SOLID PRIMARY, GLASS SECONDARY, RED CANCEL)
+       ========================================================================= */
+    .btn {
+      min-height: var(--touch-min);
+      padding: 0 28px;
+      border-radius: var(--radius-btn);
+      font-family: var(--font-family);
+      font-size: var(--fs-body);
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.14s ease;
+    }
+    .btn-lg {
+      min-height: 80px;
+      font-size: 30px;
+      padding: 0 42px;
+      border-radius: 20px;
+    }
+    .btn-primary {
+      background: var(--btn-primary-bg);
+      color: #FFFFFF;
+      border: 2px solid var(--btn-primary-bg);
+      box-shadow: 0 6px 20px rgba(11, 61, 145, 0.35);
+    }
+    .btn-primary:active, #kiosk-viewport.state-pressed .btn-primary {
+      background: var(--btn-primary-press);
+      transform: scale(0.98);
+    }
+    .btn-secondary {
+      background: var(--btn-secondary-bg);
+      color: var(--text-on-light);
+      border: 2px solid var(--btn-primary-bg);
+    }
+    .btn-cancel {
+      background: var(--btn-cancel-bg);
+      color: var(--color-error);
+      border: 2px solid var(--color-error);
+    }
+    .btn-danger-solid {
+      background: var(--color-error);
+      color: #FFFFFF;
+      border: 2px solid var(--color-error);
+    }
+    .btn-success-solid {
+      background: var(--color-success);
+      color: #FFFFFF;
+      border: 2px solid var(--color-success);
+    }
+    #kiosk-viewport.state-disabled .btn-primary,
+    .btn:disabled {
+      background: #64748B !important;
+      border-color: #64748B !important;
+      color: #E2E8F0 !important;
+      opacity: 0.72;
+      cursor: not-allowed;
+    }
+    #kiosk-viewport.state-loading .btn-primary::after {
+      content: " ⏳";
+    }
+    #kiosk-viewport.state-error .glass-panel {
+      border: 2px solid var(--color-error);
+    }
+
+    /* Footer Navigation Row */
+    .footer-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    /* Charge Status Assurance Banner (Required on EVERY Error/Cancel/Timeout/OOS Screen) */
+    .charge-banner {
+      min-height: 64px;
+      border-radius: 16px;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 24px;
+      font-weight: 800;
+    }
+    .charge-banner.safe {
+      background: rgba(255, 255, 255, 0.90);
+      border: 3px solid var(--color-success);
+      color: var(--color-success);
+    }
+    .charge-banner.refund {
+      background: rgba(255, 255, 255, 0.92);
+      border: 3px solid var(--color-error);
+      color: var(--color-error);
+    }
+
+    /* Station Grid (S02) */
+    .station-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .station-card {
+      min-height: 76px;
+      padding: 8px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.76);
+      border: 2px solid rgba(11, 42, 92, 0.22);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-on-light);
+    }
+    .station-card.selected {
+      background: var(--btn-primary-bg);
+      border-color: #FFFFFF;
+      color: #FFFFFF;
+      box-shadow: 0 6px 18px rgba(11, 61, 145, 0.35);
+    }
+    .station-card .st-name {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.12;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .station-card .st-fare {
+      font-size: 22px;
+      font-weight: 700;
+      opacity: 0.92;
+    }
+
+    /* Quantity Stepper */
+    .qty-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .qty-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: 14px;
+      border: 2px solid var(--btn-primary-bg);
+      background: #FFFFFF;
+      color: var(--text-on-light);
+      font-size: 32px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .qty-val {
+      font-size: 30px;
+      font-weight: 800;
+      min-width: 44px;
+      text-align: center;
+    }
+
+    /* Payment Cards (S03) */
+    .pay-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      flex: 1;
+    }
+    .pay-card {
+      background: rgba(255, 255, 255, 0.76);
+      border: 3px solid rgba(11, 61, 145, 0.25);
+      border-radius: 22px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+    .pay-card.selected {
+      border-color: var(--btn-primary-bg);
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 0 0 4px rgba(11, 61, 145, 0.22);
+    }
+    .pay-icon {
+      font-size: 42px;
+    }
+
+    /* Countdown Pill */
+    .timer-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 22px;
+      min-height: 64px;
+      border-radius: 999px;
+      background: #0B2A5C;
+      color: #FFFFFF;
+      font-size: 28px;
+      font-weight: 800;
+    }
+
+    /* Simulated QR & Barcode Graphics */
+    .qr-box {
+      width: 210px;
+      height: 210px;
+      background: #FFFFFF;
+      border: 6px solid #0B2A5C;
+      border-radius: 16px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      grid-template-rows: repeat(7, 1fr);
+      gap: 3px;
+    }
+    .qr-cell { background: #0B2A5C; border-radius: 2px; }
+    .qr-cell.empty { background: transparent; }
+
+    .barcode-bars {
+      height: 58px;
+      background: repeating-linear-gradient(
+        90deg,
+        #0B2A5C 0px, #0B2A5C 3px,
+        #FFFFFF 3px, #FFFFFF 6px,
+        #0B2A5C 6px, #0B2A5C 11px,
+        #FFFFFF 11px, #FFFFFF 14px,
+        #0B2A5C 14px, #0B2A5C 16px,
+        #FFFFFF 16px, #FFFFFF 20px
+      );
+      border-radius: 6px;
+      margin: 8px 0 4px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- STUDIO TOOLBAR (Outside #kiosk-viewport so node screenshots are pure 1280x800) -->
+  <div class="studio-toolbar">
+    <div class="studio-btns" id="screenTabs">
+      <button class="active" onclick="showScreen('S01')">S01 Start</button>
+      <button onclick="showScreen('S02')">S02 Destination</button>
+      <button onclick="showScreen('S03')">S03 Payment Mode</button>
+      <button onclick="showScreen('S04a')">S04a Card Pay</button>
+      <button onclick="showScreen('S04b')">S04b QR/Wallet</button>
+      <button onclick="showScreen('S05a')">S05a Ticket Issued</button>
+      <button onclick="showScreen('S05b')">S05b Declined</button>
+      <button onclick="showScreen('S06')">S06 Cancel Confirm</button>
+      <button onclick="showScreen('S07')">S07 Timeout</button>
+      <button onclick="showScreen('S08')">S08 Out of Service</button>
+    </div>
+    <div class="studio-controls">
+      <label>UI State:</label>
+      <select id="stateSelect" onchange="setVisualState(this.value)">
+        <option value="default">Default</option>
+        <option value="pressed">Pressed</option>
+        <option value="disabled">Disabled</option>
+        <option value="loading">Loading</option>
+        <option value="error">Error</option>
+      </select>
+      <button onclick="toggleOosChargeMode()" title="Switch S08 between Pre-payment Fault and Post-payment Printer Jam">S08 Fault Mode</button>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       1280 x 800 KIOSK TOUCHSCREEN VIEWPORT
+       ========================================================================= -->
+  <div id="kiosk-viewport">
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    <div class="ambient-orb orb-3"></div>
+    <div class="metro-grid-lines"></div>
+
+    <!-- PERSISTENT TOP UTILITY HEADER (EN/VI + ACCESSIBILITY ON EVERY SCREEN) -->
+    <header class="kiosk-header">
+      <div class="brand-group">
+        <div class="brand-badge">M1</div>
+        <div class="brand-titles">
+          <div class="title-main" data-en="HCMC Smart Transit • Metro Line 1" data-vi="Giao thông Thông minh TP.HCM • Metro Số 1">HCMC Smart Transit • Metro Line 1</div>
+          <div class="title-sub" data-en="Origin: Ben Thanh Station • Kiosk TVM-BT-01" data-vi="Ga đi: Bến Thành • Máy bán vé TVM-BT-01">Origin: Ben Thanh Station • Kiosk TVM-BT-01</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="util-btn" id="langBtn" onclick="toggleLang()">🌐 VI / EN</button>
+        <button class="util-btn" id="a11yBtn" onclick="toggleA11y()" data-en="♿ Large / High Contrast" data-vi="♿ Chữ lớn / Tương phản">♿ Large / High Contrast</button>
+      </div>
+    </header>
+
+    <!-- 4-STEP PROGRESS BAR -->
+    <nav class="progress-strip" id="progressBar" aria-label="Purchase Progress">
+      <div class="step-item" id="pstep-1"><span class="step-num">1</span><span data-en="Destination" data-vi="Điểm đến">Destination</span></div>
+      <div class="step-item" id="pstep-2"><span class="step-num">2</span><span data-en="Payment" data-vi="Phương thức">Payment</span></div>
+      <div class="step-item" id="pstep-3"><span class="step-num">3</span><span data-en="Pay" data-vi="Thanh toán">Pay</span></div>
+      <div class="step-item" id="pstep-4"><span class="step-num">4</span><span data-en="Ticket" data-vi="Nhận vé">Ticket</span></div>
+    </nav>
+
+    <!-- ==================== S01: HOME / START ==================== -->
+    <section class="screen active" id="screen-S01">
+      <div class="glass-panel-strong" style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; gap:22px;">
+        <div style="padding:8px 22px; border-radius:999px; background:#1B7F3B; color:#FFF; font-size:24px; font-weight:800;"
+             data-en="● IN SERVICE — PAPER & CARD/QR READY" data-vi="● ĐANG HOẠT ĐỘNG — SẴN SÀNG IN VÉ">● IN SERVICE — PAPER & CARD/QR READY</div>
+        <h1 class="kiosk-h1" data-en="Welcome! Buy Metro & Bus Tickets Here" data-vi="Xin chào! Mua vé tàu Metro & Xe buýt tại đây">Welcome! Buy Metro & Bus Tickets Here</h1>
+        <p class="kiosk-body" style="max-width:880px; font-size:28px;"
+           data-en="Fast contactless ticketing from Ben Thanh Station. Pay with Visa/Mastercard/Napas, Bank VietQR, or MoMo / VNPay / ZaloPay."
+           data-vi="Mua vé tự động nhanh chóng từ Ga Bến Thành. Hỗ trợ Thẻ ngân hàng, Mã QR Ngân hàng, hoặc Ví MoMo / VNPay / ZaloPay.">
+          Fast contactless ticketing from Ben Thanh Station. Pay with Visa/Mastercard/Napas, Bank VietQR, or MoMo / VNPay / ZaloPay.
+        </p>
+        <button class="btn btn-primary btn-lg" style="min-width:460px; min-height:92px; font-size:34px;" onclick="showScreen('S02')"
+                data-en="▶ TOUCH TO START" data-vi="▶ CHẠM ĐỂ BẮT ĐẦU">▶ TOUCH TO START</button>
+      </div>
+      <div class="footer-bar">
+        <div class="glass-panel" style="padding:12px 22px; flex:1; font-size:24px; font-weight:700;"
+             data-en="Fares: 8,000 – 20,000 VND • Single Journey Barcode Ticket"
+             data-vi="Giá vé: 8.000đ – 20.000đ • Vé lượt in mã vạch">Fares: 8,000 – 20,000 VND • Single Journey Barcode Ticket</div>
+        <button class="btn btn-cancel" onclick="resetSession()"
+                data-en="✕ Cancel / Reset" data-vi="✕ Hủy / Đặt lại">✕ Cancel / Reset</button>
+      </div>
+    </section>
+
+    <!-- ==================== S02: DESTINATION MENU ==================== -->
+    <section class="screen" id="screen-S02">
+      <div class="glass-panel" style="flex:1; display:flex; flex-direction:column; justify-content:space-between; gap:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h2 class="kiosk-h2" data-en="Select Destination & Quantity" data-vi="Chọn Ga đến & Số lượng vé">Select Destination & Quantity</h2>
+          <div class="qty-box">
+            <span class="kiosk-body" style="font-weight:800;" data-en="Tickets (1–5):" data-vi="Số vé (1–5):">Tickets (1–5):</span>
+            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+            <span class="qty-val" id="qtyDisplay">2</span>
+            <button class="qty-btn" onclick="changeQty(1)">+</button>
+          </div>
+        </div>
+
+        <div class="station-grid" id="stationGrid"></div>
+      </div>
+
+      <div class="footer-bar">
+        <button class="btn btn-cancel" onclick="openCancel('S02')" data-en="✕ Cancel" data-vi="✕ Hủy giao dịch">✕ Cancel</button>
+        <div class="glass-panel-strong" style="padding:10px 24px; flex:1; display:flex; justify-content:space-between; align-items:center;">
+          <span class="kiosk-body" id="s02Summary" style="font-weight:800;">Suoi Tien Terminal × 2</span>
+          <span style="font-size:30px; font-weight:900; color:var(--btn-primary-bg);" id="s02Total">40,000 VND</span>
+        </div>
+        <button class="btn btn-primary" onclick="showScreen('S03')" data-en="Select Payment →" data-vi="Chọn thanh toán →">Select Payment →</button>
+      </div>
+    </section>
+
+    <!-- ==================== S03: PAYMENT MODE ==================== -->
+    <section class="screen" id="screen-S03">
+      <div class="glass-panel" style="display:flex; justify-content:space-between; align-items:center; padding:14px 24px;">
+        <div>
+          <h2 class="kiosk-h2" data-en="Choose Payment Method" data-vi="Chọn Phương thức Thanh toán">Choose Payment Method</h2>
+          <div class="kiosk-body" id="s03OrderLine">Ben Thanh → Suoi Tien Terminal • 2 Tickets</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="kiosk-body" data-en="Total Fare" data-vi="Tổng tiền">Total Fare</div>
+          <div style="font-size:38px; font-weight:900; color:var(--btn-primary-bg);" id="s03Total">40,000 VND</div>
+        </div>
+      </div>
+
+      <div class="pay-grid">
+        <div class="pay-card selected" id="pcard-card" onclick="selectPayMode('card')">
+          <div>
+            <div class="pay-icon">💳</div>
+            <div style="font-size:28px; font-weight:800; margin-top:6px;" data-en="Credit / Debit Card" data-vi="Thẻ Tín dụng / Ghi nợ">Credit / Debit Card</div>
+            <p class="kiosk-body" style="margin-top:6px;" data-en="Tap contactless NFC or insert EMV chip card (Visa, Mastercard, Napas)." data-vi="Chạm thẻ không tiếp xúc NFC hoặc cắm thẻ chip EMV (Visa, Mastercard, Napas).">Tap contactless NFC or insert EMV chip card (Visa, Mastercard, Napas).</p>
+          </div>
+          <div style="font-size:24px; font-weight:800; color:var(--btn-primary-bg);" data-en="● Instant Approval" data-vi="● Xác nhận tức thì">● Instant Approval</div>
+        </div>
+
+        <div class="pay-card" id="pcard-qr" onclick="selectPayMode('qr')">
+          <div>
+            <div class="pay-icon">🏦</div>
+            <div style="font-size:28px; font-weight:800; margin-top:6px;" data-en="Bank QR (VietQR)" data-vi="Mã QR Ngân hàng">Bank QR (VietQR)</div>
+            <p class="kiosk-body" style="margin-top:6px;" data-en="Scan dynamic Napas 24/7 VietQR with any Vietnamese banking app." data-vi="Quét mã VietQR động bằng ứng dụng ngân hàng bất kỳ.">Scan dynamic Napas 24/7 VietQR with any Vietnamese banking app.</p>
+          </div>
+          <div style="font-size:24px; font-weight:800; color:var(--btn-primary-bg);" data-en="● 40+ Banks Supported" data-vi="● Hỗ trợ hơn 40 Ngân hàng">● 40+ Banks Supported</div>
+        </div>
+
+        <div class="pay-card" id="pcard-wallet" onclick="selectPayMode('wallet')">
+          <div>
+            <div class="pay-icon">📱</div>
+            <div style="font-size:28px; font-weight:800; margin-top:6px;" data-en="Digital Wallet" data-vi="Ví Điện tử">Digital Wallet</div>
+            <p class="kiosk-body" style="margin-top:6px;" data-en="Scan QR code using MoMo, VNPay, or ZaloPay mobile wallet." data-vi="Quét mã QR thanh toán qua ví MoMo, VNPay hoặc ZaloPay.">Scan QR code using MoMo, VNPay, or ZaloPay mobile wallet.</p>
+          </div>
+          <div style="font-size:24px; font-weight:800; color:var(--btn-primary-bg);" data-en="● MoMo • VNPay • ZaloPay" data-vi="● MoMo • VNPay • ZaloPay">● MoMo • VNPay • ZaloPay</div>
+        </div>
+      </div>
+
+      <div class="footer-bar">
+        <button class="btn btn-cancel" onclick="openCancel('S03')" data-en="✕ Cancel" data-vi="✕ Hủy giao dịch">✕ Cancel</button>
+        <button class="btn btn-secondary" onclick="showScreen('S02')" data-en="← Back to Stations" data-vi="← Đổi ga đến">← Back to Stations</button>
+        <button class="btn btn-primary" onclick="proceedToPay()" data-en="Proceed to Pay →" data-vi="Tiến hành thanh toán →">Proceed to Pay →</button>
+      </div>
+    </section>
+
+    <!-- ==================== S04a: CARD PAYMENT ==================== -->
+    <section class="screen" id="screen-S04a">
+      <div class="glass-panel-strong" style="flex:1; display:grid; grid-template-columns: 1.2fr 0.8fr; gap:24px; align-items:center;">
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <h2 class="kiosk-h2" data-en="Tap or Insert Your Card" data-vi="Chạm hoặc Cắm Thẻ Ngân hàng">Tap or Insert Your Card</h2>
+            <div class="timer-pill">⏱ <span id="cardTimer">00:58</span></div>
+          </div>
+          <p class="kiosk-body" data-en="Hold your contactless card against the illuminated reader below the screen, or insert chip-first. Do not remove card until prompted."
+             data-vi="Đưa thẻ chạm vào đầu đọc phát sáng phía dưới màn hình, hoặc cắm đầu gắn chip vào khe đọc thẻ.">
+            Hold your contactless card against the illuminated reader below the screen, or insert chip-first. Do not remove card until prompted.
+          </p>
+          <div style="background:rgba(11,61,145,0.10); border-radius:16px; padding:16px 20px; border:1px solid rgba(11,61,145,0.28);">
+            <div class="kiosk-body"><strong data-en="Route:" data-vi="Hành trình:">Route:</strong> <span id="s04aRoute">Ben Thanh → Suoi Tien Terminal (×2)</span></div>
+            <div style="font-size:34px; font-weight:900; color:var(--btn-primary-bg); margin-top:4px;"><span data-en="Amount:" data-vi="Số tiền:">Amount:</span> <span id="s04aAmount">40,000 VND</span></div>
+          </div>
+        </div>
+
+        <div style="background:#0B2A5C; color:#FFFFFF; border-radius:22px; padding:26px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:14px;">
+          <div style="font-size:64px;">💳 ))))</div>
+          <div style="font-size:28px; font-weight:800;" data-en="READER READY" data-vi="ĐẦU ĐỌC SẴN SÀNG">READER READY</div>
+          <div style="font-size:24px; opacity:0.9;" data-en="Awaiting EMV / NFC tap..." data-vi="Đang chờ chạm thẻ EMV / NFC...">Awaiting EMV / NFC tap...</div>
+        </div>
+      </div>
+
+      <div class="footer-bar">
+        <button class="btn btn-cancel" onclick="openCancel('S04a')" data-en="✕ Cancel Payment" data-vi="✕ Hủy thanh toán">✕ Cancel Payment</button>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" onclick="showScreen('S05b')" data-en="[Demo: Declined]" data-vi="[Thử: Từ chối]">[Demo: Declined]</button>
+          <button class="btn btn-primary" onclick="showScreen('S05a')" data-en="Simulate Card Approved ✓" data-vi="Mô phỏng Thẻ hợp lệ ✓">Simulate Card Approved ✓</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== S04b: QR / WALLET PAYMENT ==================== -->
+    <section class="screen" id="screen-S04b">
+      <div class="glass-panel-strong" style="flex:1; display:grid; grid-template-columns: 0.9fr 1.1fr; gap:24px; align-items:center;">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:12px;">
+          <div class="qr-box" id="qrMatrix"></div>
+          <div style="font-size:24px; font-weight:800;" id="qrProviderBadge">MoMo / VNPay / ZaloPay / VietQR</div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <h2 class="kiosk-h2" data-en="Scan QR Code to Pay" data-vi="Quét Mã QR để Thanh toán">Scan QR Code to Pay</h2>
+            <div class="timer-pill">⏱ <span id="qrTimer">01:54</span></div>
+          </div>
+          <p class="kiosk-body" data-en="1. Open your Banking or Digital Wallet app (MoMo / VNPay / ZaloPay). 2. Scan the QR code on the left. 3. Ticket prints automatically upon callback."
+             data-vi="1. Mở ứng dụng Ngân hàng hoặc Ví MoMo / VNPay / ZaloPay. 2. Quét mã QR bên trái. 3. Vé sẽ tự động in ngay khi nhận xác nhận.">
+            1. Open your Banking or Digital Wallet app (MoMo / VNPay / ZaloPay). 2. Scan the QR code on the left. 3. Ticket prints automatically upon callback.
+          </p>
+          <div style="background:rgba(11,61,145,0.10); border-radius:16px; padding:14px 20px; border:1px solid rgba(11,61,145,0.28);">
+            <div class="kiosk-body"><strong>Ref:</strong> TXN-20261029-0108 • <span id="s04bRoute">Suoi Tien Terminal (×2)</span></div>
+            <div style="font-size:34px; font-weight:900; color:var(--btn-primary-bg);"><span data-en="Total:" data-vi="Tổng cộng:">Total:</span> <span id="s04bAmount">40,000 VND</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bar">
+        <button class="btn btn-cancel" onclick="openCancel('S04b')" data-en="✕ Cancel Payment" data-vi="✕ Hủy thanh toán">✕ Cancel Payment</button>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" onclick="showScreen('S07')" data-en="[Demo: Timeout]" data-vi="[Thử: Hết giờ]">[Demo: Timeout]</button>
+          <button class="btn btn-primary" onclick="showScreen('S05a')" data-en="Simulate Callback Success ✓" data-vi="Mô phỏng Callback Thành công ✓">Simulate Callback Success ✓</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== S05a: TICKET ISSUED ==================== -->
+    <section class="screen" id="screen-S05a">
+      <div class="glass-panel-strong" style="flex:1; display:grid; grid-template-columns: 1.05fr 0.95fr; gap:24px; align-items:center;">
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="display:inline-flex; align-self:flex-start; padding:8px 20px; border-radius:999px; background:var(--color-success); color:#FFF; font-size:24px; font-weight:800;"
+               data-en="✓ PAYMENT APPROVED & TICKET PRINTED" data-vi="✓ THANH TOÁN THÀNH CÔNG & ĐÃ IN VÉ">✓ PAYMENT APPROVED & TICKET PRINTED</div>
+          <h2 class="kiosk-h2" data-en="Please Collect Your Ticket Below" data-vi="Vui lòng Nhận vé tại Khe trả vé">Please Collect Your Ticket Below</h2>
+          <p class="kiosk-body" data-en="Scan the printed barcode at the Metro entry gate. Keep your paper ticket for exit validation at your destination station."
+             data-vi="Quét mã vạch trên vé giấy tại cổng soát vé. Vui lòng giữ vé suốt hành trình để quét khi ra ga đến.">
+            Scan the printed barcode at the Metro entry gate. Keep your paper ticket for exit validation at your destination station.
+          </p>
+          <div class="kiosk-body" style="font-weight:700; color:var(--color-success);"
+               data-en="Auto-returning to Start screen in 12s..." data-vi="Tự động quay về màn hình chính sau 12 giây...">Auto-returning to Start screen in 12s...</div>
+        </div>
+
+        <!-- Printed Paper Ticket Preview -->
+        <div style="background:#FFFFFF; color:#0B2A5C; border:2px dashed #0B3D91; border-radius:18px; padding:18px 22px; box-shadow:0 8px 24px rgba(0,0,0,0.14);">
+          <div style="display:flex; justify-content:space-between; font-size:22px; font-weight:800; border-bottom:2px solid #E2E8F0; padding-bottom:6px;">
+            <span>HCMC METRO LINE 1</span>
+            <span>TKT-20261029-0108-1</span>
+          </div>
+          <div style="font-size:26px; font-weight:900; margin-top:8px;" id="s05aRoute">Ben Thanh → Suoi Tien Terminal</div>
+          <div style="font-size:24px; margin-top:4px;"><span data-en="Qty:" data-vi="Số vé:">Qty:</span> <strong id="s05aQty">2</strong> • <span data-en="Paid:" data-vi="Đã thu:">Paid:</span> <strong id="s05aPaid">40,000 VND</strong></div>
+          <div class="barcode-bars"></div>
+          <div style="text-align:center; font-family:monospace; font-size:20px; font-weight:700; letter-spacing:1.5px;">M1|BT|M1-14|20261029|A8F401</div>
+        </div>
+      </div>
+
+      <div class="footer-bar">
+        <button class="btn btn-cancel" onclick="showScreen('S01')" data-en="✕ Close / Cancel" data-vi="✕ Đóng / Kết thúc">✕ Close / Cancel</button>
+        <button class="btn btn-success-solid" onclick="showScreen('S01')" data-en="✓ Done – Finish & New Passenger" data-vi="✓ Hoàn tất – Khách tiếp theo">✓ Done – Finish & New Passenger</button>
+      </div>
+    </section>
+
+    <!-- ==================== S05b: PAYMENT DECLINED ==================== -->
+    <section class="screen" id="screen-S05b">
+      <div class="glass-panel-strong" style="flex:1; display:flex; flex-direction:column; justify-content:space-between; gap:14px; border:2px solid var(--color-error);">
+        <div style="display:flex; align-items:center; gap:16px;">
+          <div style="width:68px; height:68px; border-radius:50%; background:var(--color-error); color:#FFF; font-size:38px; font-weight:900; display:flex; align-items:center; justify-content:center;">!</div>
+          <div>
+            <h2 class="kiosk-h2" style="color:var(--color-error);" data-en="Payment Declined by Issuer" data-vi="Thanh toán Bị Từ chối">Payment Declined by Issuer</h2>
+            <p class="kiosk-body" data-en="Error E-402: The bank or digital wallet rejected this authorization (insufficient balance or card limit)."
+               data-vi="Mã lỗi E-402: Ngân hàng hoặc ví điện tử từ chối giao dịch (không đủ số dư hoặc vượt hạn mức thẻ).">
+              Error E-402: The bank or digital wallet rejected this authorization (insufficient balance or card limit).
+            </p>
+          </div>
+        </div>
+
+        <div class="charge-banner safe">
+          <span>✔</span>
+          <span data-en="CHARGE STATUS: NOT CHARGED — 0 VND was deducted from your card or wallet."
+                data-vi="TRẠNG THÁI TRỪ TIỀN: CHƯA BỊ TRỪ TIỀN — Tài khoản của bạn không bị thu phí (0đ).">
+            CHARGE STATUS: NOT CHARGED — 0 VND was deducted from your card or wallet.
+          </span>
+        </div>
+
+        <p class="kiosk-body" data-en="Would you like to try a different payment method (e.g., Bank QR or Wallet) or cancel your journey?"
+           data-vi="Bạn muốn thử lại bằng phương thức thanh toán khác (Mã QR hoặc Ví điện tử) hay hủy giao dịch?">
+          Would you like to try a different payment method (e.g., Bank QR or Wallet) or cancel your journey?
+        </p>
+      </div>
+
+      <div class="footer-bar">
+        <button class="btn btn-cancel" onclick="showScreen('S01')" data-en="✕ Cancel & Exit" data-vi="✕ Hủy & Thoát">✕ Cancel & Exit</button>
+        <button class="btn btn-primary" onclick="showScreen('S03')" data-en="↻ Try Another Payment Method" data-vi="↻ Chọn Phương thức Thanh toán Khác">↻ Try Another Payment Method</button>
+      </div>
+    </section>
+
+    <!-- ==================== S06: CANCEL CONFIRMATION ==================== -->
+    <section class="screen" id="screen-S06">
+      <div class="glass-panel-strong" style="flex:1; display:flex; flex-direction:column; justify-content:space-between; gap:16px;">
+        <div>
+          <h2 class="kiosk-h2" data-en="Cancel Current Ticket Purchase?" data-vi="Xác nhận Hủy Giao dịch Mua vé?">Cancel Current Ticket Purchase?</h2>
+          <p class="kiosk-body" style="margin-top:10px;"
+             data-en="Your selected destination and active payment session will be cleared immediately."
+             data-vi="Ga đến đã chọn và phiên thanh toán hiện tại sẽ bị hủy ngay lập tức.">
+            Your selected destination and active payment session will be cleared immediately.
+          </p>
+        </div>
+
+        <div class="charge-banner safe">
+          <span>✔</span>
+          <span data-en="CHARGE STATUS: NOT CHARGED — Cancelling now will NOT bill your card or wallet."
+                data-vi="TRẠNG THÁI TRỪ TIỀN: CHƯA BỊ TRỪ TIỀN — Hủy lúc này hoàn toàn KHÔNG trừ tiền của bạn.">
+            CHARGE STATUS: NOT CHARGED — Cancelling now will NOT bill your card or wallet.
+          </span>
+        </div>
+
+        <p class="kiosk-body" data-en="Press 'Continue Buying' to return to your ticket, or 'Yes, Cancel Purchase' to exit."
+           data-vi="Nhấn 'Tiếp tục mua vé' để quay lại, hoặc 'Đồng ý Hủy giao dịch' để kết thúc.">
+          Press 'Continue Buying' to return to your ticket, or 'Yes, Cancel Purchase' to exit.
+        </p>
+      </div>
+
+      <div class="footer-bar">
+        <button class="btn btn-danger-solid" onclick="showScreen('S01')" data-en="✕ Yes, Cancel Purchase" data-vi="✕ Đồng ý Hủy giao dịch">✕ Yes, Cancel Purchase</button>
+        <button class="btn btn-primary" onclick="returnFromCancel()" data-en="← Continue Buying Ticket" data-vi="← Tiếp tục Mua vé">← Continue Buying Ticket</button>
+      </div>
+    </section>
+
+    <!-- ==================== S07: PAYMENT / SESSION TIMEOUT ==================== -->
+    <section class="screen" id="screen-S07">
+      <div class="glass-panel-strong" style="flex:1; display:flex; flex-direction:column; justify-content:space-between; gap:14px; border:2px solid var(--color-error);">
+        <div style="display:flex; align-items:center; gap:16px;">
+          <div style="width:68px; height:68px; border-radius:50%; background:#9A5B00; color:#FFF; font-size:34px; font-weight:900; display:flex; align-items:center; justify-content:center;">⏱</div>
+          <div>
+            <h2 class="kiosk-h2" data-en="Payment Time Expired (Timeout)" data-vi="Hết Thời gian Chờ Thanh toán">Payment Time Expired (Timeout)</h2>
+            <p class="kiosk-body" data-en="We did not receive confirmation from the card reader or payment gateway within the allowed time window."
+               data-vi="Hệ thống không nhận được phản hồi từ thẻ hoặc cổng thanh toán trong thời gian quy định.">
+              We did not receive confirmation from the card reader or payment gateway within the allowed time window.
+            </p>
+          </div>
+        </div>
+
+        <div class="charge-banner safe">
+          <span>✔</span>
+          <span data-en="CHARGE STATUS: NOT CHARGED — QR code invalidated. Any late bank transfer is auto-refunded within 24h."
+                data-vi="TRẠNG THÁI TRỪ TIỀN: CHƯA BỊ TRỪ TIỀN — Mã QR đã hủy. Giao dịch trừ muộn (nếu có) tự động hoàn tiền trong 24h.">
+            CHARGE STATUS: NOT CHARGED — QR code invalidated. Any late bank transfer is auto-refunded within 24h.
+          </span>
+        </div>
+
+        <p class="kiosk-body" data-en="Do not scan the expired QR code. Generate a fresh payment code or cancel to return to Start."
+           data-vi="Vui lòng không quét lại mã QR cũ. Chọn thanh toán lại để tạo mã mới hoặc Hủy để thoát.">
+          Do not scan the expired QR code. Generate a fresh payment code or cancel to return to Start.
+        </p>
+      </div>
+
+      <div class="footer-bar">
+        <button class="btn btn-cancel" onclick="showScreen('S01')" data-en="✕ Cancel & Return Home" data-vi="✕ Hủy & Về Trang chủ">✕ Cancel & Return Home</button>
+        <button class="btn btn-primary" onclick="showScreen('S03')" data-en="↻ Retry Payment (New Timer)" data-vi="↻ Thử lại Thanh toán (Tạo mã mới)">↻ Retry Payment (New Timer)</button>
+      </div>
+    </section>
+
+    <!-- ==================== S08: OUT OF SERVICE ==================== -->
+    <section class="screen" id="screen-S08">
+      <div class="glass-panel-strong" style="flex:1; display:flex; flex-direction:column; justify-content:space-between; gap:14px; border:3px solid var(--color-error);">
+        <div style="display:flex; align-items:center; gap:16px;">
+          <div style="width:72px; height:72px; border-radius:18px; background:var(--color-error); color:#FFF; font-size:40px; font-weight:900; display:flex; align-items:center; justify-content:center;">⚠</div>
+          <div>
+            <h2 class="kiosk-h2" style="color:var(--color-error);" data-en="Machine Temporarily Out of Service" data-vi="Máy Bán Vé Tạm Ngưng Phục Vụ">Machine Temporarily Out of Service</h2>
+            <p class="kiosk-body" data-en="Hardware/System Alert [HW-PRN-01]: Thermal ticket printer out of paper or server link unavailable."
+               data-vi="Cảnh báo Kỹ thuật [HW-PRN-01]: Máy in vé hết giấy hoặc mất kết nối máy chủ trung tâm.">
+              Hardware/System Alert [HW-PRN-01]: Thermal ticket printer out of paper or server link unavailable.
+            </p>
+          </div>
+        </div>
+
+        <div class="charge-banner safe" id="s08ChargeBanner">
+          <span id="s08ChargeIcon">✔</span>
+          <span id="s08ChargeText"
+                data-en="CHARGE STATUS: NOT CHARGED — Kiosk locked before payment. Please use adjacent TVM-BT-02 or Ticket Counter."
+                data-vi="TRẠNG THÁI TRỪ TIỀN: CHƯA BỊ TRỪ TIỀN — Máy khóa trước khi thu tiền. Vui lòng dùng máy TVM-BT-02 kế bên.">
+            CHARGE STATUS: NOT CHARGED — Kiosk locked before payment. Please use adjacent TVM-BT-02 or Ticket Counter.
+          </span>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(11,42,92,0.08); padding:14px 20px; border-radius:14px;">
+          <span class="kiosk-body"><strong>Station Support Hotline:</strong> 1900-638761 • Counter Window #2 (15m right)</span>
+          <span class="kiosk-body"><strong>Kiosk ID:</strong> TVM-BT-01</span>
+        </div>
+      </div>
+
+      <div class="footer-bar">
+        <button class="btn btn-cancel" onclick="showScreen('S01')" data-en="✕ Cancel / Exit Screen" data-vi="✕ Hủy / Thoát màn hình">✕ Cancel / Exit Screen</button>
+        <button class="btn btn-secondary" disabled data-en="Ticket Sales Disabled Until Restored" data-vi="Tạm khóa bán vé chờ nhân viên xử lý">Ticket Sales Disabled Until Restored</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const stations = [
+      { code: 'M1-02', en: 'Opera House',        vi: 'Nhà hát TP',         fare: 8000 },
+      { code: 'M1-03', en: 'Ba Son',             vi: 'Ba Son',             fare: 8000 },
+      { code: 'M1-04', en: 'Van Thanh Park',     vi: 'CV Văn Thánh',       fare: 9000 },
+      { code: 'M1-05', en: 'Tan Cang',           vi: 'Tân Cảng',           fare: 10000 },
+      { code: 'M1-06', en: 'Thao Dien',          vi: 'Thảo Điền',          fare: 11000 },
+      { code: 'M1-07', en: 'An Phu',             vi: 'An Phú',             fare: 12000 },
+      { code: 'M1-08', en: 'Rach Chiec',         vi: 'Rạch Chiếc',         fare: 14000 },
+      { code: 'M1-09', en: 'Phuoc Long',         vi: 'Phước Long',         fare: 15000 },
+      { code: 'M1-10', en: 'Binh Thai',          vi: 'Bình Thái',          fare: 16000 },
+      { code: 'M1-11', en: 'Thu Duc',            vi: 'Thủ Đức',            fare: 18000 },
+      { code: 'M1-12', en: 'Hi-Tech Park',       vi: 'Khu Công nghệ cao',  fare: 19000 },
+      { code: 'M1-14', en: 'Suoi Tien Terminal', vi: 'BX Suối Tiên',       fare: 20000 }
+    ];
+
+    let lang = 'en';
+    let selectedStationIdx = 11; // Suoi Tien default
+    let quantity = 2;
+    let payMode = 'card';
+    let lastActiveScreen = 'S02';
+    let s08PostPaymentMode = false;
+
+    function formatVnd(n) {
+      return n.toLocaleString('en-US') + ' VND';
+    }
+
+    function renderStations() {
+      const grid = document.getElementById('stationGrid');
+      grid.innerHTML = '';
+      stations.forEach((st, idx) => {
+        const div = document.createElement('div');
+        div.className = 'station-card' + (idx === selectedStationIdx ? ' selected' : '');
+        div.onclick = () => { selectedStationIdx = idx; renderStations(); updateSummaries(); };
+        const name = lang === 'en' ? st.en : st.vi;
+        div.innerHTML = `<div class="st-name">${name}</div><div class="st-fare">${st.fare.toLocaleString('en-US')} VND</div>`;
+        grid.appendChild(div);
+      });
+    }
+
+    function renderQrPattern() {
+      const pattern = [
+        1,1,1,0,1,1,1,
+        1,0,1,1,1,0,1,
+        1,1,1,0,1,1,1,
+        0,1,0,1,0,1,0,
+        1,1,1,1,0,1,1,
+        1,0,1,0,1,0,1,
+        1,1,1,0,1,1,0
+      ];
+      const box = document.getElementById('qrMatrix');
+      box.innerHTML = pattern.map(b => `<div class="qr-cell ${b ? '' : 'empty'}"></div>`).join('');
+    }
+
+    function updateSummaries() {
+      const st = stations[selectedStationIdx];
+      const stName = lang === 'en' ? st.en : st.vi;
+      const origin = lang === 'en' ? 'Ben Thanh' : 'Bến Thành';
+      const total = st.fare * quantity;
+
+      document.getElementById('qtyDisplay').textContent = quantity;
+      document.getElementById('s02Summary').textContent = `${stName} × ${quantity}`;
+      document.getElementById('s02Total').textContent = formatVnd(total);
+      document.getElementById('s03OrderLine').textContent = `${origin} → ${stName} • ${quantity} ${lang === 'en' ? 'Ticket(s)' : 'Vé'}`;
+      document.getElementById('s03Total').textContent = formatVnd(total);
+      document.getElementById('s04aRoute').textContent = `${origin} → ${stName} (×${quantity})`;
+      document.getElementById('s04aAmount').textContent = formatVnd(total);
+      document.getElementById('s04bRoute').textContent = `${stName} (×${quantity})`;
+      document.getElementById('s04bAmount').textContent = formatVnd(total);
+      document.getElementById('s05aRoute').textContent = `${origin} → ${stName}`;
+      document.getElementById('s05aQty').textContent = quantity;
+      document.getElementById('s05aPaid').textContent = formatVnd(total);
+    }
+
+    function changeQty(delta) {
+      quantity = Math.min(5, Math.max(1, quantity + delta));
+      updateSummaries();
+    }
+
+    function selectPayMode(mode) {
+      payMode = mode;
+      ['card', 'qr', 'wallet'].forEach(m => {
+        document.getElementById('pcard-' + m).classList.toggle('selected', m === mode);
+      });
+      document.getElementById('qrProviderBadge').textContent =
+        mode === 'qr' ? 'Napas 24/7 • VietQR Bank' : 'MoMo • VNPay • ZaloPay';
+    }
+
+    function proceedToPay() {
+      showScreen(payMode === 'card' ? 'S04a' : 'S04b');
+    }
+
+    function openCancel(fromScreen) {
+      lastActiveScreen = fromScreen;
+      showScreen('S06');
+    }
+
+    function returnFromCancel() {
+      showScreen(lastActiveScreen || 'S02');
+    }
+
+    function resetSession() {
+      selectedStationIdx = 11;
+      quantity = 1;
+      selectPayMode('card');
+      renderStations();
+      updateSummaries();
+      showScreen('S01');
+    }
+
+    function updateProgress(screenId) {
+      const stepMap = {
+        'S01': 0, 'S02': 1, 'S03': 2, 'S04a': 3, 'S04b': 3,
+        'S05a': 4, 'S05b': 3, 'S06': 2, 'S07': 3, 'S08': 0
+      };
+      const current = stepMap[screenId] ?? 0;
+      for (let i = 1; i <= 4; i++) {
+        const el = document.getElementById('pstep-' + i);
+        el.classList.remove('active', 'done');
+        if (current === 4 || i < current) el.classList.add('done');
+        else if (i === current) el.classList.add('active');
+      }
+    }
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-' + id).classList.add('active');
+      document.querySelectorAll('#screenTabs button').forEach(b => {
+        b.classList.toggle('active', b.textContent.startsWith(id + ' '));
+      });
+      updateProgress(id);
+    }
+
+    function toggleLang() {
+      lang = lang === 'en' ? 'vi' : 'en';
+      document.getElementById('langBtn').classList.toggle('active', lang === 'vi');
+      document.querySelectorAll('[data-en]').forEach(el => {
+        el.textContent = el.getAttribute('data-' + lang);
+      });
+      renderStations();
+      updateSummaries();
+    }
+
+    function toggleA11y() {
+      const vp = document.getElementById('kiosk-viewport');
+      const enabled = vp.classList.toggle('a11y-mode');
+      document.getElementById('a11yBtn').classList.toggle('active', enabled);
+    }
+
+    function setVisualState(state) {
+      const vp = document.getElementById('kiosk-viewport');
+      vp.classList.remove('state-pressed', 'state-disabled', 'state-loading', 'state-error');
+      if (state !== 'default') vp.classList.add('state-' + state);
+    }
+
+    function toggleOosChargeMode() {
+      s08PostPaymentMode = !s08PostPaymentMode;
+      const banner = document.getElementById('s08ChargeBanner');
+      const icon = document.getElementById('s08ChargeIcon');
+      const txt = document.getElementById('s08ChargeText');
+      if (s08PostPaymentMode) {
+        banner.className = 'charge-banner refund';
+        icon.textContent = '⚠';
+        txt.setAttribute('data-en', 'CHARGE STATUS: CHARGED (PRINTER JAM) — Auto-refund queued for Ref #TXN-0108, or claim ticket at Counter #2.');
+        txt.setAttribute('data-vi', 'TRẠNG THÁI TRỪ TIỀN: ĐÃ GHI NHẬN THU TIỀN (LỖI KẸT GIẤY) — Đã xếp hàng hoàn tiền tự động Mã #TXN-0108 hoặc nhận vé tại Quầy #2.');
+      } else {
+        banner.className = 'charge-banner safe';
+        icon.textContent = '✔';
+        txt.setAttribute('data-en', 'CHARGE STATUS: NOT CHARGED — Kiosk locked before payment. Please use adjacent TVM-BT-02 or Ticket Counter.');
+        txt.setAttribute('data-vi', 'TRẠNG THÁI TRỪ TIỀN: CHƯA BỊ TRỪ TIỀN — Máy khóa trước khi thu tiền. Vui lòng dùng máy TVM-BT-02 kế bên.');
+      }
+      txt.textContent = txt.getAttribute('data-' + lang);
+      showScreen('S08');
+    }
+
+    renderStations();
+    renderQrPattern();
+    updateSummaries();
+    updateProgress('S01');
+  </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+@startuml Architecture_Diagram_TVM_MVC
+title Smart Ticketing System (TVM) - Hybrid MVC & Layered Service Architecture (Section 4.2.1)\nAligned 100% with Member M3 Section 3.3.3 Class Diagrams (Core 1/2 & Supporting 2/2)
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam defaultFontName Segoe UI
+
+package "TVM Kiosk Client (.NET 8 WinForms — MVC Pattern)" #EFF6FF {
+  package "Presentation Layer (MVC View)" #DBEAFE {
+    [Display\n+ showMenu(), showSummary()\n+ showPaymentModes(), showQR()\n+ showMessage(), showOutOfService()] as DisplayCls
+    [MainForm (Screens S01..S08)\n& TransactionReportForm] as WinFormsUI
+  }
+
+  package "Control & Hardware Abstraction Layer (MVC Controller)" #CCFBF1 {
+    [TVMController\n- state : MachineState\n+ onStart(), selectDestination()\n+ confirmOrder(), selectPaymentMethod()\n+ onPaymentResult(), cancel(), printTickets()] as Ctrl
+    [TicketPrinter\n+ isReady(), getPaperLevel(), print()] as Printer
+    [CardReader\n+ readCard() : CardData, eject()] as Reader
+    [AlertService\n+ sendAlert(type, detail)] as AlertSvc
+  }
+
+  package "Domain Model Layer (MVC Model — Shared M3 Classes)" #E0E7FF {
+    [Destination & Fare\n(TransportMode: Bus | Mrt,\nwhole VND AmountVND)] as DestFare
+    [Transaction, Ticket (1..5), Refund\n(16-digit Luhn TicketNumber,\nFareSnapshot, RetryCount)] as TxTicket
+    [Payment (abstract)\n<|-- CardPayment (last4, gatewayToken)\n<|-- QRPayment (expiresAt=120s, provider)] as PayHierarchy
+  }
+}
+
+package "Backend Service & Data Persistence Layer" #FFFBEB {
+  [PaymentService\n+ startPayment(), handleCallback()\n+ queryStatus(), cancelPayment(), refund()] as PaySvc
+  interface "IPaymentGateway" as IGW
+  [Gateway Adapters:\nCardAcquirerAdapter | VietQRAdapter\nMomoAdapter | ZaloPayAdapter | VNPayAdapter] as Adapters
+  [TransactionRepository\n+ save(), findById(), findUnfinished()\n+ getDestinations(), getFare()] as Repo
+}
+
+database "SQL Server (TvmDemo)\nDestination, Fare, [Transaction],\nPayment, Ticket, Refund" as DB #FEF3C7
+cloud "External Payment APIs\n(Bank Acquirer, VietQR,\nMoMo, ZaloPay, VNPay)" as ExtAPIs #FCE7F3
+
+WinFormsUI <--> DisplayCls : binds UI events
+DisplayCls <--> Ctrl : user actions / view updates
+Ctrl *-- Printer : ESC/POS
+Ctrl *-- Reader : USB PC/SC
+Ctrl --> AlertSvc
+Ctrl --> TxTicket : creates & mutates
+TxTicket --> DestFare
+TxTicket o-- PayHierarchy
+Ctrl --> PaySvc
+PaySvc --> IGW : selects by PaymentMethod
+IGW <|.. Adapters
+Adapters <--> ExtAPIs : HTTPS TLS 1.2+ REST &\nSigned HMAC Webhook (FR10)
+Ctrl --> Repo
+Repo <--> DB : Parameterized SqlClient\n(TDS over TLS :1433)
+@enduml

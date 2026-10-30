@@ -1,0 +1,106 @@
+// SE Lab Group Assignment 1: Smart Ticketing System – TVM Deployment Diagram (Graphviz DOT)
+// Render with: dot -Tpng deployment_diagram.dot -o deployment_diagram.png
+// Or paste at: https://dreampuf.github.io/GraphvizOnline/
+
+digraph TVM_Deployment {
+    rankdir=LR;
+    compound=true;
+    splines=ortho;
+    nodesep=0.55;
+    ranksep=1.15;
+    fontname="Segoe UI";
+    fontsize=13;
+    label="UML Deployment Diagram – Smart Ticketing System (TVM - UC01)\nThree Network Boundaries, Hardware Peripherals, Application Tier, MSSQL & External Gateways";
+    labelloc="t";
+
+    node [shape=box, style="rounded,filled", fontname="Segoe UI", fontsize=10, fillcolor="#FFFFFF", color="#0B3D91", penwidth=1.4];
+    edge [fontname="Segoe UI", fontsize=9, color="#1E3A8A", penwidth=1.2];
+
+    // =========================================================================
+    // BOUNDARY 1: STATION LAN
+    // =========================================================================
+    subgraph cluster_station_lan {
+        label="Boundary 1: Station LAN (VLAN 10 – Transit Station Kiosk Network)";
+        style="rounded,dashed,filled";
+        fillcolor="#EEF4FF";
+        color="#0B3D91";
+
+        subgraph cluster_tvm_kiosk {
+            label="<<device>> TVM Kiosk (Windows 11 IoT | .NET 8)";
+            style="rounded,filled";
+            fillcolor="#F8FAFC";
+            color="#0B3D91";
+
+            TouchDisplay [label="<<device>>\nTouchscreen & QR Display\n(1280x800 Capacitive)"];
+            TvmClient    [label="<<artifact>> TvmClient.exe (WinForms MVC)\n---------------------------------------------\n• View: MainForm & Screens S01–S08\n• Controller: TicketController\n• Model: TicketVendorMachine, Destination, Fare,\n  Transaction, Ticket, Payment\n  (CardPayment, QRPayment, WalletPayment)\n• Driver: TicketPrinter", fillcolor="#E0F2FE"];
+            CardReader   [label="<<device>>\nEMV / NFC Card Reader\n(ISO 7816 / 14443 P2PE)"];
+            ThermalPrint [label="<<device>>\nThermal Ticket Printer\n(80mm + Barcode)"];
+
+            TouchDisplay -> TvmClient [dir=both, label="USB HID Touch (->)\nHDMI UI + QR Frame (<-)"];
+            TvmClient -> CardReader   [dir=both, label="USB / PC-SC\nAPDU (->) / EMV Token (<-)"];
+            TvmClient -> ThermalPrint [dir=both, label="USB / ESC-POS\nPrint (->) / Paper Status (<-)"];
+        }
+    }
+
+    // =========================================================================
+    // BOUNDARY 2: OPERATOR PRIVATE NETWORK
+    // =========================================================================
+    subgraph cluster_operator_net {
+        label="Boundary 2: Operator Private Network (Data Center: DMZ + App Tier + DB Tier)";
+        style="rounded,dashed,filled";
+        fillcolor="#ECFDF5";
+        color="#1B7F3B";
+
+        BackOffice [label="<<device>>\nBack-Office & Monitoring Console\n(Station Operator / Maintenance UI)"];
+
+        subgraph cluster_app_server {
+            label="<<executionEnvironment>> Application Server (ASP.NET Core 8 Web API)";
+            style="rounded,filled";
+            fillcolor="#F8FAFC";
+            color="#1AA6B7";
+
+            TicketSvc  [label="TicketService\n(Fare Sync, Ticket Issuance,\nKiosk Heartbeat)"];
+            PaymentSvc [label="PaymentService &\nPaymentGateway Adapter\n(Token Auth, QR Gen, Timeout)"];
+            WebhookEp  [label="Webhook Callback Endpoint\nPOST /api/v1/payments/webhook\n(HMAC-SHA256 + Nonce Check)", fillcolor="#FEF3C7"];
+            Repo       [label="TvmRepository\n(Microsoft.Data.SqlClient)"];
+
+            TicketSvc -> Repo;
+            PaymentSvc -> Repo;
+            WebhookEp -> PaymentSvc [label="Verified Event (->)"];
+        }
+
+        DbServer [shape=cylinder, fillcolor="#E6F4F7", label="<<database>>\nDatabase Server (SQL Server 2022)\nDatabase: TvmDemo\nTables: Destination, [Transaction],\nPayment, Ticket"];
+
+        BackOffice -> TicketSvc [dir=both, label="HTTPS TLS 1.2+ REST/WSS\n(TCP 443, <->)"];
+        Repo -> DbServer        [dir=both, label="TDS over TLS 1.2+\n(TCP Port 1433, <->)"];
+    }
+
+    // =========================================================================
+    // BOUNDARY 3: EXTERNAL / INTERNET
+    // =========================================================================
+    subgraph cluster_internet {
+        label="Boundary 3: External / Internet (Third-Party Payment Gateways)";
+        style="rounded,dashed,filled";
+        fillcolor="#FFF7ED";
+        color="#B45309";
+
+        BankApi    [label="<<external system>>\nBank / Card Acquirer\n(Visa / Mastercard / NapAs)"];
+        MomoApi    [label="<<external system>>\nMoMo Wallet API"];
+        VnpayApi   [label="<<external system>>\nVNPay QR Gateway API"];
+        ZalopayApi [label="<<external system>>\nZaloPay Wallet API"];
+    }
+
+    // Cross-boundary edges
+    TvmClient -> TicketSvc  [dir=both, label="HTTPS TLS 1.2+ REST/JSON\n(mTLS, TCP 443, <->)"];
+    TvmClient -> PaymentSvc [dir=both, label="HTTPS TLS 1.2+ REST/SSE\n(mTLS, TCP 443, <->)"];
+
+    PaymentSvc -> BankApi    [label="HTTPS TLS 1.2+ REST (->)"];
+    PaymentSvc -> MomoApi    [label="HTTPS TLS 1.2+ REST (->)"];
+    PaymentSvc -> VnpayApi   [label="HTTPS TLS 1.2+ REST (->)"];
+    PaymentSvc -> ZalopayApi [label="HTTPS TLS 1.2+ REST (->)"];
+
+    BankApi -> WebhookEp     [color="#B3261E", style=dashed, label="HTTPS Webhook + HMAC (->)"];
+    MomoApi -> WebhookEp     [color="#B3261E", style=dashed, label="HTTPS Webhook + HMAC (->)"];
+    VnpayApi -> WebhookEp    [color="#B3261E", style=dashed, label="HTTPS Webhook + HMAC (->)"];
+    ZalopayApi -> WebhookEp  [color="#B3261E", style=dashed, label="HTTPS Webhook + HMAC (->)"];
+}
