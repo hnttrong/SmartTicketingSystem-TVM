@@ -1,0 +1,70 @@
+@startuml
+' M2 - Activity 2: Communication with external payment gateways (section 3.2.2)
+' Names follow M3's files: class_diagram_1/2, sequence_1/2/3, state_chart.
+title Communication with External Payment Gateways
+
+|TVM|
+start
+:PaymentService.startPayment(txn, method)\nPayment.start();
+:IPaymentGateway.createPayment(txnId, amount);
+if (gateway accepted the request?) then (no)
+  :Transaction.markFailed(reason);
+  stop
+else (yes)
+endif
+
+if (method = Credit Card?) then (yes)
+  :CardPayment: card result returned\nby the card acquirer (30 s limit);
+else (no: Bank QR or Digital Wallet)
+  :QRPayment.generateQR()\nTVMController.showQR(qrContent, 120);
+  |Passenger|
+  :Scan QR code and confirm payment;
+  |Payment Gateway|
+  :Process payment;
+  :Send signed callback\n(success or failure);
+endif
+
+|TVM|
+if (result received before timeout?) then (no)
+  if (Transaction.canRegenerateQR()?) then (yes)
+    :PaymentService.startPayment(txn, method)\nQRPayment.generateQR() again (max 2);
+    stop
+  else (no)
+    :PaymentService.queryStatus(txn)\nIPaymentGateway.queryStatus(ref);
+    if (status known?) then (no)
+      :Transaction.markPendingReconciliation();
+      stop
+    else (paid or not paid)
+      if (paid?) then (no)
+        :PaymentService.cancelPayment(txn)\nTransaction.markExpired();
+        stop
+      endif
+    endif
+  endif
+endif
+
+:PaymentService.handleCallback(callback)\nIPaymentGateway.verifyCallback(callback)\n(signature, amount, reference);
+if (duplicate callback for this transaction?) then (yes)
+  :ignore callback (FR20);
+  stop
+endif
+if (valid?) then (no)
+  :AlertService.sendAlert()\ncallback rejected and logged (UC03 E2);
+  stop
+endif
+if (transaction still AwaitingPayment?) then (no: expired or cancelled)
+  :PaymentService.refund(txn)\nTransaction.markRefundPending();
+  :AlertService.sendAlert() if not refunded in 60 s;
+  stop
+endif
+
+:TVMController.onPaymentResult(APPROVED)\nTransaction.markConfirmed();
+:return to activity 1: printTickets();
+stop
+
+note right
+  Reconciliation at end of day compares
+  settlement files with transactions. It is
+  not in M3's class diagram yet: name needed.
+end note
+@enduml

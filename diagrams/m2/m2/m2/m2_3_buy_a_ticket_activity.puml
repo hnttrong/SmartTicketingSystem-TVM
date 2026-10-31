@@ -1,0 +1,83 @@
+@startuml
+' M2 - Activity 1: Passenger buys a ticket at the TVM (section 3.2.1)
+' Names follow M3's sequence_1/2/3 and state_chart.
+' FR19: every transaction is recorded, including failed and cancelled ones.
+' FR22: out of service when the printer, the server connection or all payment modes are unavailable.
+title Passenger Buys a Ticket at the TVM
+
+|Passenger|
+start
+:Touch Start;
+
+|TVM|
+:TVMController.onStart()\nTicketPrinter.isReady(), HasEnoughPaper();
+if (printer ready and paper enough?) then (no)
+  :Display.showOutOfService();
+  stop
+else (yes)
+endif
+:TransactionRepository.getDestinations()\nDisplay.showMenu(destinations);
+
+|Passenger|
+:Choose destination and quantity (1 to 5);
+
+|TVM|
+:TVMController.selectDestination(destinationId, quantity)\nTransactionRepository.getFare()\nTransaction.lockFare(fare), calculateTotal();
+:Display.showSummary(txn);
+
+|Passenger|
+:Confirm the order;
+if (confirmed?) then (no)
+  |TVM|
+  :TVMController.cancel()\nTransaction.markCancelled()\nTransactionRepository.save(txn) (FR19);
+  stop
+else (yes)
+endif
+
+|TVM|
+:TVMController.confirmOrder()\nTransactionRepository.save(txn)\nDisplay.showPaymentModes(modes);
+if (server connection and payment modes available?) then (no)
+  :Display.showOutOfService()\nTransaction.markPendingReconciliation();
+  stop
+endif
+
+repeat
+  |Passenger|
+  :Choose payment mode and pay;
+  |TVM|
+  :TVMController.selectPaymentMethod(method)\nPaymentService.startPayment(txn, method)\n(see activity 2);
+  if (idle 60 s without touch?) then (yes)
+    :Display.showMessage("Session ends in 10 seconds");
+    if (passenger touches screen?) then (no)
+      :TVMController.onIdleTimeout()\nPaymentService.cancelPayment(txn)\nTransaction.markCancelled()\nTransactionRepository.save(txn) (FR19);
+      stop
+    endif
+  endif
+  if (payment approved?) then (yes)
+    :TVMController.onPaymentResult(APPROVED)\nTransaction.markConfirmed();
+  else (no)
+    :TVMController.onPaymentResult(DECLINED)\nTransaction.markFailed(reason)\nTransactionRepository.save(txn) (FR19);
+  endif
+repeat while (not approved and Transaction.canRetry(): retryCount < 3\nand passenger chooses another attempt?) is (yes) not (no)
+
+if (approved?) then (no)
+  :PaymentService.cancelPayment(txn)\nTransaction.markCancelled()\nTransactionRepository.save(txn) (FR19);
+  :Display.showMessage("Payment failed. No charge.");
+  stop
+endif
+
+|TVM|
+:TVMController.printTickets()\nfor each ticket: GenerateBarcode(machineCode, sequence), TicketPrinter.print();
+if (every ticket printed, one retry allowed?) then (no)
+  :Ticket.Cancel() for each printed ticket\nTransaction.markRefundPending()\nPaymentService.refund(txn)\nTransactionRepository.save(txn) (FR19);
+  :AlertService.sendAlert("PRINTER_ERROR");
+  :Display.showMessage("Refund requested, reference shown");
+  stop
+else (yes)
+endif
+:Transaction.markCompleted()\nTransactionRepository.save(txn)\nDisplay.showMessage("Please take your tickets");
+
+|Passenger|
+:Take ticket and leave;
+stop
+@enduml
