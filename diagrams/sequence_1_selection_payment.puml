@@ -1,0 +1,81 @@
+@startuml Sequence_1_SelectionPayment
+title Sequence Diagram 1/3 - UC01 Buy a Ticket: start, selection and payment
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam sequenceMessageAlign left
+autonumber
+
+actor Passenger
+participant Display
+participant TVMController as Ctl
+participant CardReader as Reader
+participant TicketPrinter as Printer
+participant TransactionRepository as Repo
+participant Transaction as Txn
+participant PaymentService as PS
+participant Payment as Pay
+participant IPaymentGateway as GW
+
+note over Display : UI = Display (View)
+note over Ctl : Controller = TVMController
+note over Repo : Database = TransactionRepository
+note over Pay : CardPayment or QRPayment
+note over GW : one adapter per provider
+
+== Start (FR1, FR17) ==
+Passenger -> Display : touch Start
+Display -> Ctl : OnStart()
+Ctl -> Printer : IsReady()
+Printer --> Ctl : ready
+Ctl -> Printer : HasEnoughPaper()
+Printer --> Ctl : enough
+alt printer not ready or paper low
+  Ctl -> Display : ShowOutOfService()
+  note right of Ctl : state OutOfService (see state chart)
+else printer ready and paper enough
+  Ctl -> Repo : GetDestinations()
+  Repo --> Ctl : destinations
+  Ctl -> Display : ShowMenu(destinations)
+
+  == Selection (FR2 to FR5) ==
+  Passenger -> Display : choose destination and quantity (1 to 5)
+  Display -> Ctl : SelectDestination(destinationId, quantity)
+  Ctl -> Repo : GetFare(destinationId)
+  Repo --> Ctl : fare
+  create Txn
+  Ctl -> Txn : new Transaction
+  Ctl -> Txn : LockFare(fare)
+  Ctl -> Txn : CalculateTotal()
+  Txn --> Ctl : totalAmount
+  Ctl -> Display : ShowSummary(txn)
+  Passenger -> Display : confirm the order
+  Display -> Ctl : ConfirmOrder()
+  Ctl -> Repo : Save(txn)
+  Ctl -> Display : ShowPaymentModes(modes)
+
+  == Payment (FR6 to FR10) ==
+  Passenger -> Display : choose payment mode
+  Display -> Ctl : SelectPaymentMethod(method)
+  opt method = CreditCard
+    Ctl -> Display : ShowMessage("Insert or tap your card")
+    Ctl -> Reader : ReadCard()
+    Reader --> Ctl : CardData (token, scheme, last 4)
+  end
+  Ctl -> PS : StartPayment(txn, method)
+  create Pay
+  PS -> Pay : new CardPayment or QRPayment
+  PS -> Pay : Start()
+  Pay -> GW : CreatePayment(txnId, amount)
+  GW --> Pay : gatewayRef
+  alt method = BankQR or DigitalWallet
+    Pay -> Pay : GenerateQR()
+    PS --> Ctl : payment
+    Ctl -> Display : ShowQR(qrContent, 120)
+    note right of Display : 120 s countdown (FR13)
+  else method = CreditCard
+    PS --> Ctl : payment
+    note right of Ctl : card result within 30 s (NFR3)
+  end
+  note over Ctl : state AwaitingPayment. Result: see sequence 2/3 and 3/3
+end
+@enduml

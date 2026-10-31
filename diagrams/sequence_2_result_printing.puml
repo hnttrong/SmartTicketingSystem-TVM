@@ -1,0 +1,69 @@
+@startuml Sequence_2_ResultPrinting
+title Sequence Diagram 2/3 - UC01 Buy a Ticket: approved payment, printing and refund after a print failure
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam sequenceMessageAlign left
+autonumber
+
+participant Display
+participant TVMController as Ctl
+participant CardReader as Reader
+participant TicketPrinter as Printer
+participant TransactionRepository as Repo
+participant Transaction as Txn
+participant Ticket
+participant PaymentService as PS
+participant IPaymentGateway as GW
+participant AlertService as Alerts
+
+== Result arrives (FR10) ==
+GW -> PS : HandleCallback(callback)
+PS -> GW : VerifyCallback(callback)
+GW --> PS : valid or not valid
+alt signature, amount and reference are valid
+  PS -> Ctl : OnPaymentResult(result)
+  alt result = APPROVED
+    Ctl -> Txn : MarkConfirmed()
+    Ctl -> Repo : Save(txn)
+    opt method = CreditCard
+      Ctl -> Reader : Eject()
+    end
+
+    == Printing (FR15, FR16) ==
+    Ctl -> Ctl : PrintTickets()
+    loop for each ticket, sequence = 0 .. quantity - 1
+      Ctl -> Ticket : new Ticket
+      Ctl -> Ticket : GenerateBarcode(machineCode, sequence)
+      Ctl -> Printer : Print(ticket)
+      Printer --> Ctl : printed
+      opt printed = false
+        Ctl -> Printer : Print(ticket)
+        note right of Printer : one retry (FR18)
+        Printer --> Ctl : printed
+      end
+    end
+    alt every ticket printed
+      Ctl -> Txn : MarkCompleted()
+      Ctl -> Repo : Save(txn)
+      Ctl -> Display : ShowMessage("Please take your tickets")
+    else a ticket still fails after the retry (FR18)
+      loop for each ticket already printed
+        Ctl -> Ticket : Cancel()
+      end
+      Ctl -> Txn : MarkRefundPending()
+      Ctl -> PS : Refund(txn)
+      PS -> GW : Refund(reference, amount)
+      GW --> PS : refundReference
+      PS --> Ctl : refund
+      Ctl -> Alerts : SendAlert("PRINTER_ERROR", detail)
+      Ctl -> Repo : Save(txn)
+      Ctl -> Display : ShowMessage("Refund requested, reference shown")
+      note right of Ctl : refund request within 60 s (NFR6). The refund covers the whole transaction.
+    end
+  else result = DECLINED or EXPIRED
+    note over Ctl : see sequence 3/3
+  end
+else signature, amount or reference not valid
+  note over PS : callback rejected and logged. No state change.
+end
+@enduml
