@@ -1,0 +1,78 @@
+@startuml Sequence_3_FailuresCancel
+title Sequence Diagram 3/3 - UC01 Buy a Ticket: declined, expired, no callback, cancel and late payment
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam sequenceMessageAlign left
+autonumber
+
+actor Passenger
+participant Display
+participant TVMController as Ctl
+participant TransactionRepository as Repo
+participant Transaction as Txn
+participant PaymentService as PS
+participant IPaymentGateway as GW
+
+== Declined, card timeout or gateway error (FR12) ==
+PS -> Ctl : OnPaymentResult(result = DECLINED)
+Ctl -> Txn : MarkFailed(reason)
+Ctl -> Txn : CanRetry()
+Txn --> Ctl : retryCount < 3
+alt can retry
+  Ctl -> Display : ShowPaymentModes(modes)
+else 3 attempts used
+  Ctl -> Txn : MarkCancelled()
+  Ctl -> Repo : Save(txn)
+  Ctl -> Display : ShowMessage("Payment failed. No charge.")
+end
+
+== QR code expired (FR13) ==
+PS -> Ctl : OnPaymentResult(result = EXPIRED)
+Ctl -> Txn : CanRegenerateQR()
+Txn --> Ctl : qrRegenCount < 2
+alt can regenerate
+  Ctl -> PS : StartPayment(txn, method)
+  PS --> Ctl : payment
+  Ctl -> Display : ShowQR(qrContent, 120)
+else limit reached
+  Ctl -> PS : CancelPayment(txn)
+  PS -> GW : Cancel(reference)
+  Ctl -> Txn : MarkExpired()
+  Ctl -> Repo : Save(txn)
+  Ctl -> Display : ShowMessage("The QR code expired. No charge.")
+end
+
+== No callback received (FR25) ==
+Ctl -> PS : QueryStatus(txn)
+PS -> GW : QueryStatus(reference)
+GW --> PS : status
+alt status still unknown
+  Ctl -> Txn : MarkPendingReconciliation()
+  Ctl -> Repo : Save(txn)
+  Ctl -> Display : ShowMessage("Payment is being checked")
+else status known
+  PS -> Ctl : OnPaymentResult(result)
+end
+
+== Cancel or no touch for 60 s (FR11, FR21) ==
+alt passenger presses Cancel
+  Passenger -> Display : press Cancel
+  Display -> Ctl : Cancel()
+else idle limit reached
+  Display -> Ctl : OnIdleTimeout()
+  Ctl -> Display : ShowMessage("Session ends in 10 seconds")
+end
+Ctl -> PS : CancelPayment(txn)
+PS -> GW : Cancel(reference)
+GW --> PS : cancelled
+Ctl -> Txn : MarkCancelled()
+Ctl -> Repo : Save(txn)
+Ctl -> Display : ShowMessage("Cancelled. No charge.")
+
+== Late payment after cancel or expiry (FR14, Q11) ==
+GW -> PS : HandleCallback(callback)
+PS -> GW : VerifyCallback(callback)
+GW --> PS : valid
+PS -> GW : Refund(reference, amount)
+note right of PS : no ticket is issued. The refund is logged as a late payment.
+@enduml

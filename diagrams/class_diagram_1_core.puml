@@ -1,0 +1,175 @@
+@startuml ClassDiagram_BuyTicket_Core
+title Class Diagram (Domain Model) - UC01 Buy a Ticket - core classes
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam class {
+  BackgroundColor #DAE8FC
+  BorderColor #6C8EBF
+}
+hide empty members
+hide enum methods
+skinparam nodesep 40
+skinparam ranksep 50
+
+class TVMController {
+  - state : MachineState
+  - idleSeconds : int
+  + onStart() : void
+  + selectDestination(destinationId : int, quantity : int) : void
+  + confirmOrder() : void
+  + selectPaymentMethod(method : PaymentMethod) : void
+  + onPaymentResult(result : PaymentResult) : void
+  + cancel() : void
+  + onIdleTimeout() : void
+  + printTickets() : void
+  + recoverLastTransaction() : void
+}
+
+class Display {
+  + showMenu(destinations : List<Destination>) : void
+  + showSummary(txn : Transaction) : void
+  + showPaymentModes(modes : List<PaymentMethod>) : void
+  + showQR(qrContent : string, secondsLeft : int) : void
+  + showMessage(text : string) : void
+  + showOutOfService() : void
+}
+
+class TicketPrinter {
+  - paperRemaining : int
+  - ready : bool
+  + isReady() : bool
+  + getPaperLevel() : int
+  + print(ticket : Ticket) : bool
+}
+
+class Destination {
+  - destinationId : int
+  - name : string
+  - mode : TransportMode
+  - origin : string
+}
+
+class Fare {
+  - fareId : int
+  - amountVND : decimal
+  - effectiveFrom : DateTime
+  + getAmount() : decimal
+}
+
+class Transaction {
+  - transactionId : string
+  - quantity : int
+  - fareSnapshot : decimal
+  - totalAmount : decimal
+  - retryCount : int
+  - qrRegenCount : int
+  - status : TransactionStatus
+  - createdAt : DateTime
+  - gatewayRef : string
+  + lockFare(fare : Fare) : void
+  + calculateTotal() : decimal
+  + canRetry() : bool
+  + canRegenerateQR() : bool
+  + markConfirmed() : void
+  + markFailed(reason : string) : void
+  + markCancelled() : void
+  + markCompleted() : void
+  + markRefundPending() : void
+  + markPendingReconciliation() : void
+}
+
+class Ticket {
+  - ticketNumber : string
+  - barcode : string
+  - mode : TransportMode
+  - origin : string
+  - destination : string
+  - issuedAt : DateTime
+  - validUntil : DateTime
+  - fare : decimal
+  + generateBarcode(sequence : int) : string
+}
+
+class Refund {
+  - refundId : string
+  - amount : decimal
+  - reference : string
+  - requestedAt : DateTime
+  - status : RefundStatus
+}
+
+class PaymentService {
+  + startPayment(txn : Transaction, method : PaymentMethod) : Payment
+  + handleCallback(callback : GatewayCallback) : PaymentResult
+  + queryStatus(txn : Transaction) : PaymentStatus
+  + cancelPayment(txn : Transaction) : bool
+  + refund(txn : Transaction) : Refund
+}
+
+abstract class Payment {
+  # paymentId : string
+  # amount : decimal
+  # status : PaymentStatus
+  # gatewayRef : string
+  + {abstract} start() : void
+  + cancel() : bool
+}
+
+class CardPayment {
+  - cardScheme : string
+  - last4 : string
+  - gatewayToken : string
+  + start() : void
+}
+
+class QRPayment {
+  - qrContent : string
+  - expiresAt : DateTime
+  - provider : WalletProvider
+  + generateQR() : string
+  + isExpired() : bool
+  + start() : void
+}
+
+interface IPaymentGateway {
+  + createPayment(txnId : string, amount : decimal) : string
+  + queryStatus(ref : string) : PaymentStatus
+  + cancel(ref : string) : bool
+  + refund(ref : string, amount : decimal) : string
+  + verifyCallback(callback : GatewayCallback) : bool
+}
+
+TVMController "1" *-- "1" Display
+TVMController "1" *-- "1" TicketPrinter
+TVMController "1" --> "1" PaymentService
+TVMController "1" --> "0..1" Transaction : current
+
+Destination "1" -- "1..*" Fare : priced by
+Transaction "*" --> "1" Destination
+Transaction "1" *-- "1..5" Ticket
+Transaction "1" o-- "0..*" Payment
+Transaction "1" --> "0..1" Refund
+
+Payment <|-- CardPayment
+Payment <|-- QRPayment
+Payment "*" --> "1" IPaymentGateway : uses
+
+PaymentService "1" --> "1..*" IPaymentGateway : selects by method
+PaymentService ..> Payment : creates
+PaymentService ..> Refund : creates
+TicketPrinter ..> Ticket : prints
+
+note bottom of QRPayment
+  provider = null for a bank (VietQR) code,
+  MOMO / ZALOPAY / VNPAY for a wallet code.
+end note
+
+note as N1
+  Enumerations (types of attributes, not counted as classes):
+  MachineState, TransactionStatus, TransportMode, PaymentMethod,
+  PaymentStatus, RefundStatus, WalletProvider.
+  Value types: PaymentResult, GatewayCallback, CardData.
+  Infrastructure classes are in diagram 2/2.
+end note
+@enduml

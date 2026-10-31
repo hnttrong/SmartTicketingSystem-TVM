@@ -1,0 +1,55 @@
+@startuml StateChart_TVM
+title State Chart - TVM during UC01 Buy a Ticket (MachineState)
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam state {
+  BackgroundColor #DAE8FC
+  BorderColor #6C8EBF
+}
+hide empty description
+
+[*] --> Recovering : powerOn
+
+Recovering --> Idle : RecoverLastTransaction()\n[nothing unfinished]
+Recovering --> Printing : RecoverLastTransaction()\n[paid, tickets not printed]\n/ FindUnfinished()
+Recovering --> Refunding : RecoverLastTransaction()\n[paid, cannot print]\n/ MarkRefundPending()
+
+Idle --> SelectingDestination : OnStart()\n[IsReady() and HasEnoughPaper()]\n/ GetDestinations(), ShowMenu()
+Idle --> OutOfService : faultDetected\n/ SendAlert(), ShowOutOfService()
+Idle --> Maintenance : staffLogin
+Idle --> Refunding : latePayment\n[VerifyCallback() is true]\n/ Refund()
+
+SelectingDestination --> ReviewingOrder : SelectDestination(id, quantity)\n[quantity 1 to 5]\n/ GetFare(), LockFare(), CalculateTotal(), ShowSummary()
+SelectingDestination --> Cancelled : Cancel() or OnIdleTimeout()
+
+ReviewingOrder --> SelectingPayment : ConfirmOrder()\n/ Save(), ShowPaymentModes()
+ReviewingOrder --> Cancelled : Cancel() or OnIdleTimeout()
+
+SelectingPayment --> AwaitingPayment : SelectPaymentMethod(method)\n/ StartPayment()
+SelectingPayment --> Cancelled : Cancel() or OnIdleTimeout()
+
+state AwaitingPayment {
+  state "WaitingCard (30 s)" as WaitingCard
+  state "WaitingQRScan (120 s countdown)" as WaitingQRScan
+}
+
+AwaitingPayment --> PaymentConfirmed : OnPaymentResult(APPROVED)\n/ MarkConfirmed(), Save()
+AwaitingPayment --> SelectingPayment : OnPaymentResult(DECLINED)\n[CanRetry()]\n/ MarkFailed(), ShowPaymentModes()
+AwaitingPayment --> Cancelled : OnPaymentResult(DECLINED)\n[not CanRetry()]\n/ MarkFailed(), MarkCancelled()
+AwaitingPayment --> AwaitingPayment : OnPaymentResult(EXPIRED)\n[CanRegenerateQR()]\n/ StartPayment(), ShowQR()
+AwaitingPayment --> Cancelled : OnPaymentResult(EXPIRED)\n[not CanRegenerateQR()]\n/ CancelPayment(), MarkExpired()
+AwaitingPayment --> Cancelled : QueryStatus() still unknown\n/ MarkPendingReconciliation()
+AwaitingPayment --> Cancelled : Cancel() or OnIdleTimeout()\n/ CancelPayment(), MarkCancelled()
+
+PaymentConfirmed --> Printing : PrintTickets()\n/ GenerateBarcode(), Print()
+
+Printing --> Completed : every Print() succeeded\n/ MarkCompleted(), Save()
+Printing --> Refunding : Print() failed after one retry\n/ Cancel() each printed ticket, MarkRefundPending(),\nRefund(), SendAlert()
+
+Completed --> Idle : tickets taken or 10 s\n/ ShowMessage()
+Cancelled --> Idle : ShowMessage()
+Refunding --> Idle : refund requested\n/ ShowMessage()
+
+OutOfService --> Idle : faultCleared
+Maintenance --> Idle : staffLogout
+@enduml

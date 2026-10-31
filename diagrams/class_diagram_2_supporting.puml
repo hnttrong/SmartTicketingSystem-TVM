@@ -1,0 +1,64 @@
+@startuml ClassDiagram_BuyTicket_Supporting
+title Class Diagram 2/2 - supporting classes, adapters and value types
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam class {
+  BackgroundColor #DAE8FC
+  BorderColor #6C8EBF
+}
+hide empty members
+
+class TVMController
+class PaymentService
+
+class CardReader {
+  + readCard() : CardData
+  + eject() : void
+}
+class TransactionRepository {
+  + save(txn : Transaction) : void
+  + findById(id : string) : Transaction
+  + findUnfinished() : List<Transaction>
+  + getDestinations() : List<Destination>
+  + getFare(destinationId : int) : Fare
+}
+class AlertService {
+  + sendAlert(type : string, detail : string) : void
+}
+interface IPaymentGateway
+class CardAcquirerAdapter
+class VietQRAdapter
+class MomoAdapter
+class ZaloPayAdapter
+class VNPayAdapter
+class CardData {
+  - gatewayToken : string
+  - cardScheme : string
+  - last4 : string
+}
+class GatewayCallback {
+  - transactionRef : string
+  - amount : decimal
+  - signature : string
+  - status : PaymentStatus
+}
+class PaymentResult {
+  - status : PaymentStatus
+  - gatewayRef : string
+  - reason : string
+}
+
+TVMController "1" *-- "1" CardReader
+TVMController "1" --> "1" TransactionRepository
+TVMController "1" --> "1" AlertService
+CardReader ..> CardData : returns
+PaymentService ..> GatewayCallback : receives
+PaymentService ..> PaymentResult : returns
+IPaymentGateway <|.. CardAcquirerAdapter
+IPaymentGateway <|.. VietQRAdapter
+IPaymentGateway <|.. MomoAdapter
+IPaymentGateway <|.. ZaloPayAdapter
+IPaymentGateway <|.. VNPayAdapter
+PaymentService "1" --> "1..*" IPaymentGateway
+@enduml
