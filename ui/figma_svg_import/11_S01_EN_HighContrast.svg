@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800">
+  <title>11_S01_EN_HighContrast</title>
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#003E7E"/>
+      <stop offset="55%" stop-color="#0267A6"/>
+      <stop offset="100%" stop-color="#00A8B5"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#001833" flood-opacity="0.18"/>
+    </filter>
+    </defs>
+  <rect id="Background" width="1280" height="800" fill="#0A0E17"/>
+  
+
+  <!-- Header Bar R(0, 0, 1280, 84) in MainForm.cs -->
+  <g id="Top_Header_Bar">
+    <rect x="0" y="0" width="1280" height="84" fill="#141C2B" fill-opacity="1.0"/>
+    <line x1="0" y1="83" x2="1280" y2="83" stroke="#FFFFFF" stroke-opacity="0.22" stroke-width="1"/>
+    <g id="Metro_Badge">
+      <rect x="28" y="14" width="56" height="56" rx="14" fill="#00A8B5"/>
+      <text x="56" y="49" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700" fill="#FFFFFF" text-anchor="middle">M1</text>
+    </g>
+    <text id="Header_Title" x="100" y="38" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="700" fill="#FFFFFF">HCMC Smart Transit • Metro Line 1</text>
+    <text id="Header_Subtitle" x="100" y="64" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="600" fill="#C8EBFA">Origin: Ben Thanh Station • Kiosk TVM-BT-01</text>
+    <g id="Btn_Language_Toggle">
+      <rect x="824" y="10" width="170" height="64" rx="14" fill="#FFFFFF" fill-opacity="0.16" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="2"/>
+      <text x="909" y="48" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">🌐 VI / EN</text>
+    </g>
+    <g id="Btn_Accessibility_Toggle">
+      <rect x="1008" y="10" width="244" height="64" rx="14" fill="#FFD60A" fill-opacity="1.0" stroke="#FFD60A" stroke-opacity="0.55" stroke-width="2"/>
+      <text x="1130" y="48" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#0A0E17" text-anchor="middle">♿ Large Text / Contrast</text>
+    </g>
+  </g>
+
+  <!-- StepProgressBar R(28, 94, 1224, 58) in MainForm.cs -->
+  <g id="Progress_Stepper_Bar">
+    <rect x="28" y="94" width="1224" height="58" rx="14" fill="#141C2B" fill-opacity="0.94" stroke="#FFD60A" stroke-width="1.5"/>
+    <g id="Step_1">
+      <circle cx="65" cy="123" r="15" fill="#DCE4F0"/>
+      <text x="65" y="128" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#4E6178" text-anchor="middle">1</text>
+      <text x="90" y="129" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#D2DCEB">1. Destination</text>
+    </g>
+    <line x1="296" y1="123" x2="326" y2="123" stroke="#C3D0E0" stroke-width="2"/>
+    <g id="Step_2">
+      <circle cx="371" cy="123" r="15" fill="#DCE4F0"/>
+      <text x="371" y="128" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#4E6178" text-anchor="middle">2</text>
+      <text x="396" y="129" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#D2DCEB">2. Method</text>
+    </g>
+    <line x1="602" y1="123" x2="632" y2="123" stroke="#C3D0E0" stroke-width="2"/>
+    <g id="Step_3">
+      <circle cx="677" cy="123" r="15" fill="#DCE4F0"/>
+      <text x="677" y="128" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#4E6178" text-anchor="middle">3</text>
+      <text x="702" y="129" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#D2DCEB">3. Payment</text>
+    </g>
+    <line x1="908" y1="123" x2="938" y2="123" stroke="#C3D0E0" stroke-width="2"/>
+    <g id="Step_4">
+      <circle cx="983" cy="123" r="15" fill="#DCE4F0"/>
+      <text x="983" y="128" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#4E6178" text-anchor="middle">4</text>
+      <text x="1008" y="129" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#D2DCEB">4. Ticket</text>
+    </g>
+  </g>
+  <rect id="S01_Hero_Card" x="28" y="162" width="1224" height="536" rx="24" fill="#141C2B" fill-opacity="0.94" stroke="#FFD60A" stroke-width="1.5" filter="url(#cardShadow)"/>
+
+  <!-- Status Pill R(362+28=390, 38+162=200, 500, 44) -->
+  <g id="S01_Service_Status_Pill">
+    <rect x="390" y="200" width="500" height="44" rx="12" fill="#E8F8EE"/>
+    <text x="640" y="228" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#1B7F3B" text-anchor="middle">● IN SERVICE — READY FOR PASSENGERS</text>
+  </g>
+
+  <!-- Title R(60+28=88, 118+162=280, 1104, 110) -->
+  <text id="S01_Title" x="640" y="340" font-family="Segoe UI, Arial, sans-serif" font-size="38" font-weight="700" fill="#FFFFFF" text-anchor="middle">Welcome! Buy Metro &amp; Bus Tickets Here</text>
+
+  <!-- Desc R(120+28=148, 240+162=402, 984, 72) -->
+  <text id="S01_Description_1" x="640" y="428" font-family="Segoe UI, Arial, sans-serif" font-size="20" fill="#D2DCEB" text-anchor="middle">Fast ticket purchase from Ben Thanh Station. Pay via EMV/NFC Card,</text>
+  <text id="S01_Description_2" x="640" y="458" font-family="Segoe UI, Arial, sans-serif" font-size="20" fill="#D2DCEB" text-anchor="middle">Bank VietQR, or MoMo / VNPay / ZaloPay E-Wallet.</text>
+  <g id="Btn_S01_Touch_To_Start">
+    <rect x="360" y="504" width="560" height="96" rx="22" fill="#FFD60A" stroke="#FFD60A" stroke-width="0"/>
+    <text x="640" y="561" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#0A0E17" text-anchor="middle">▶  TOUCH TO START</text>
+  </g>
+  <rect id="S01_Bottom_Info_Panel" x="28" y="710" width="930" height="72" rx="16" fill="#141C2B" fill-opacity="0.94" stroke="#FFD60A" stroke-width="1.5" filter="url(#cardShadow)"/>
+  <text id="S01_Fare_Hint" x="48" y="753" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="700" fill="#FFFFFF">Single-journey fare: 8,000 – 20,000 VND • Printed 1D Barcode Ticket</text>
+  <g id="Btn_S01_Cancel_Reset">
+    <rect x="976" y="712" width="276" height="70" rx="16" fill="#FFF5F5" stroke="#C2272D" stroke-width="2"/>
+    <text x="1114" y="754" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700" fill="#C2272D" text-anchor="middle">✕ Cancel / Reset</text>
+  </g>
+</svg>

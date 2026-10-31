@@ -1,0 +1,47 @@
+@startuml Deployment_Diagram_TVM
+title Smart Ticketing System (TVM) - UML 2.5 Deployment Diagram (Section 4.2.2)\nAligned 100% with Section 3.3.3 Class Diagrams & Section 4.2.1 MVC Architecture
+skinparam shadowing false
+skinparam defaultFontName Segoe UI
+
+rectangle "ZONE 1: Station LAN (10.10.x.0/24 — Isolated Kiosk VLAN)" #F0F9FF {
+  node "<<device>>\nTVM Kiosk Unit\n(Windows 11 IoT Enterprise x64)" as Kiosk {
+    node "<<execution environment>>\n.NET 8 Desktop Runtime (WinForms)" as DotNetClient {
+      artifact "<<artifact>>\nTvmClient.exe\n(Display / MainForm S01-S08,\nTVMController, Domain Model)" as ClientApp
+    }
+    node "<<device>>\nTouchscreen & QR Display\n(1280x800 Capacitive)" as Screen
+    node "<<device>>\nCardReader (EMV / NFC)" as CardRdr
+    node "<<device>>\nTicketPrinter (80mm Thermal)" as ThermalPrn
+  }
+}
+
+rectangle "ZONE 2: Operator Private Network (172.16.x.0/24 — Core Transit DC)" #F0FDFA {
+  node "<<device / server>>\nCentral Application Server" as AppSrv {
+    node "<<execution environment>>\nASP.NET Core 8 (Kestrel :443)" as AspNet {
+      artifact "<<artifact>>\nTvmBackend.Api.dll\n(PaymentService, AlertService,\nIPaymentGateway Adapters,\nTransactionRepository,\nWebhook /api/v1/payments/webhook)" as BackendApi
+    }
+  }
+
+  node "<<device / database server>>\nDatabase Server (SQL Server 2022)" as DbSrv {
+    database "<<database>>\nTvmDemo\n(Destination, Fare, [Transaction],\nPayment, Ticket, Refund)" as SqlDb
+  }
+
+  node "<<device / workstation>>\nBack-Office & Monitoring Console" as Console {
+    artifact "<<artifact>>\nOperator Admin Web SPA" as AdminSpa
+  }
+}
+
+rectangle "ZONE 3: External / Public Internet (DMZ)" #FDF2F8 {
+  node "<<external system>>\nBank / Card Acquirer Host\n(CardAcquirerAdapter Target)" as BankHost
+  node "<<external system>>\nVietQR & Wallet Gateways\n(VietQR, MoMo, ZaloPay, VNPay)" as WalletHosts
+}
+
+ClientApp <--> Screen : HDMI + USB HID (Bi-dir)
+ClientApp <--> CardRdr : USB / PC-SC APDU\n(CardData: token + last4, NFR9)
+ClientApp <--> ThermalPrn : USB Virtual COM / ESC-POS\n(16-digit Luhn Barcode, DR4)
+ClientApp <--> BackendApi : HTTPS TLS 1.2+ REST/JSON\nPort 443 (mTLS + API Key)
+BackendApi <--> SqlDb : TDS over TLS 1.2+ (TCP :1433)\nParameterized SQL
+AdminSpa <--> BackendApi : HTTPS / WSS (:443, RBAC)
+BackendApi <--> BankHost : HTTPS TLS 1.3 (:443)
+BackendApi --> WalletHosts : 1. Create QR Order (HTTPS POST :443)
+WalletHosts ..> BackendApi : 2. Async Webhook Callback (:443)\nGatewayCallback + HMAC-SHA256 (FR10)
+@enduml

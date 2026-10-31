@@ -1,0 +1,652 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TvmDemo</name>
+    </assembly>
+    <members>
+        <member name="T:TvmDemo.Controllers.PurchaseFlowOutcome">
+            <summary>
+            High-level outcome of <see cref="M:TvmDemo.Controllers.TicketController.ExecutePaymentAndPrintAsync(System.Threading.CancellationToken)"/> mapped to UI screens.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Controllers.PurchaseFlowResult">
+            <summary>
+            Result returned to the View after processing a ticket purchase attempt.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Controllers.PurchaseFlowResult.#ctor(TvmDemo.Controllers.PurchaseFlowOutcome,System.String,System.String,System.Boolean,TvmDemo.Models.Transaction)">
+            <summary>
+            Result returned to the View after processing a ticket purchase attempt.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Controllers.TicketController">
+            <summary>
+            MVC Controller coordinating the UC01 "Buy a Ticket" workflow across the View (<c>MainForm</c>),
+            Domain Models (<see cref="T:TvmDemo.Models.TicketVendorMachine"/>, <see cref="T:TvmDemo.Models.Destination"/>, <see cref="T:TvmDemo.Models.Fare"/>,
+            <see cref="T:TvmDemo.Models.Transaction"/>, <see cref="T:TvmDemo.Models.Payment"/>, <see cref="T:TvmDemo.Models.Ticket"/>), Services
+            (<see cref="P:TvmDemo.Controllers.TicketController.PaymentService"/>, <see cref="P:TvmDemo.Controllers.TicketController.TicketPrinter"/>), and <see cref="T:TvmDemo.Data.ITvmRepository"/>.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Controllers.TicketController.InitializeOrRefreshAsync">
+            <summary>
+            Checks SQL Server connectivity and loads the active HCMC Metro Line 1 station menu.
+            Transitions machine to <see cref="F:TvmDemo.Models.TvmState.OutOfService"/> cleanly if DB is unavailable.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Controllers.TicketController.TryStartSession(System.String@)">
+            <summary>
+            UC01 Step 1: Passenger presses Start on S01.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Controllers.TicketController.SelectDestinationAndQuantity(TvmDemo.Models.Destination,System.Int32)">
+            <summary>
+            UC01 Step 2: Updates selected destination and ticket quantity (1–5) using <see cref="T:TvmDemo.Models.Fare"/>.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Controllers.TicketController.TryProceedToPaymentMode(System.String@)">
+            <summary>
+            Proceeds from S02 to S03 after verifying sufficient paper for the requested ticket quantity.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Controllers.TicketController.SelectPaymentMode(TvmDemo.Models.PaymentModeType,System.String)">
+            <summary>
+            UC01 Step 3: Sets the chosen payment mode and optional digital wallet provider.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Controllers.TicketController.BeginPaymentStepAsync">
+            <summary>
+            UC01 Step 4: Creates a <c>Pending</c> <see cref="T:TvmDemo.Models.Transaction"/> in SQL Server and prepares
+            the concrete <see cref="T:TvmDemo.Models.Payment"/> object prior to showing S04a or S04b.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Controllers.TicketController.ExecutePaymentAndPrintAsync(System.Threading.CancellationToken)">
+            <summary>
+            UC01 Steps 4–6: Awaits card tap or QR gateway callback asynchronously, prints barcode tickets,
+            and commits the final status (<c>Completed</c>, <c>Failed</c>, or <c>Cancelled</c>) to SQL Server.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Controllers.TicketController.ConfirmUserCancelAsync">
+            <summary>
+            Cancels an active session from S06 Cancel Confirmation (marks any Pending DB transaction as Cancelled).
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Controllers.TicketController.HandleSessionCountdownExpiredAsync">
+            <summary>
+            Handles countdown timer expiration on S04a/S04b if the timer hits 00:00 prior to gateway completion.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Controllers.TicketController.LoadReportRowsAsync(System.Int32,System.String)">
+            <summary>
+            Queries recent joined transaction records for the Output Report <c>DataGridView</c>.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Data.AppSettingsConfig">
+            <summary>
+            Configuration model bound from <c>appsettings.json</c>.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Data.ITvmRepository">
+            <summary>
+            Data access contract for the TVM persistence layer (aligned with Member M3's TransactionRepository &amp; Domain Model).
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Data.SqlTvmRepository">
+            <summary>
+            Microsoft SQL Server implementation of <see cref="T:TvmDemo.Data.ITvmRepository"/> using <c>Microsoft.Data.SqlClient</c>
+            with parameterized SQL queries against the M3-aligned <c>TvmDemo</c> relational schema
+            (<c>Destination</c>, <c>Fare</c>, <c>[Transaction]</c>, <c>Payment</c>, <c>Ticket</c>, <c>Refund</c>).
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Models.Destination">
+            <summary>
+            Represents a selectable transit station destination (MRT or Bus) on the TVM menu.
+            Maps directly to the <c>dbo.Destination</c> table in <c>TvmDemo</c>.
+            </summary>
+        </member>
+        <member name="P:TvmDemo.Models.Destination.DestinationId">
+            <summary>Database primary key.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Destination.StationCode">
+            <summary>Unique station code (e.g., M1-02 through M1-14).</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Destination.StationNameEn">
+            <summary>Station name in English.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Destination.StationNameVi">
+            <summary>Station name in Vietnamese.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Destination.LineType">
+            <summary>Transport line type ("MRT" or "Bus").</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Destination.ZoneNumber">
+            <summary>Fare zone number (1–5).</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Destination.DistanceKm">
+            <summary>Route distance from Ben Thanh origin in kilometers.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Destination.UnitFareVnd">
+            <summary>Single-journey adult fare in VND.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Destination.EstimatedMinutes">
+            <summary>Estimated travel time in minutes.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Destination.IsActive">
+            <summary>Indicates whether the station is currently open for ticket sales.</summary>
+        </member>
+        <member name="M:TvmDemo.Models.Destination.GetDisplayName(System.Boolean)">
+            <summary>
+            Returns the localized station display name.
+            </summary>
+            <param name="isVietnamese">True for Vietnamese, false for English.</param>
+        </member>
+        <member name="M:TvmDemo.Models.Destination.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:TvmDemo.Models.Fare">
+            <summary>
+            Domain class responsible for fare calculation and validation for a selected destination and ticket quantity.
+            </summary>
+        </member>
+        <member name="F:TvmDemo.Models.Fare.MinQuantity">
+            <summary>Minimum tickets allowed in a single transaction.</summary>
+        </member>
+        <member name="F:TvmDemo.Models.Fare.MaxQuantity">
+            <summary>Maximum tickets allowed in a single transaction.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Fare.Destination">
+            <summary>Associated destination station.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Fare.UnitFareVnd">
+            <summary>Unit fare per passenger in VND.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Fare.Quantity">
+            <summary>Requested passenger ticket count (1–5).</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Fare.TotalAmountVnd">
+            <summary>Computed total fare in VND.</summary>
+        </member>
+        <member name="M:TvmDemo.Models.Fare.#ctor(TvmDemo.Models.Destination,System.Int32)">
+            <summary>
+            Initializes a new <see cref="T:TvmDemo.Models.Fare"/> calculation for the given destination and quantity.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Models.Fare.SetQuantity(System.Int32)">
+            <summary>
+            Updates and validates the passenger ticket quantity (clamped or validated to 1–5).
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Models.Fare.CalculateTotal">
+            <summary>
+            Calculates the total payable fare in VND.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Models.Fare.FormatVnd(System.Decimal)">
+            <summary>
+            Formats a VND amount cleanly for kiosk display (e.g., "40,000 VND").
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Models.PaymentResultStatus">
+            <summary>
+            Payment authorization statuses matching <c>dbo.Payment.PaymentStatus</c>.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Models.Payment">
+            <summary>
+            Abstract base class for all TVM payment instruments (<see cref="T:TvmDemo.Models.CardPayment"/>,
+            <see cref="T:TvmDemo.Models.QRPayment"/>, and <see cref="T:TvmDemo.Models.WalletPayment"/>).
+            </summary>
+        </member>
+        <member name="P:TvmDemo.Models.Payment.PaymentId">
+            <summary>Database primary key.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Payment.TransactionId">
+            <summary>Foreign key to parent <see cref="T:TvmDemo.Models.Transaction"/>.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Payment.PaymentType">
+            <summary>Discriminator matching <c>dbo.Payment.PaymentType</c>.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Payment.ProviderName">
+            <summary>Acquirer or wallet provider name (e.g., Visa/Mastercard, VietQR-Bank, MoMo, VNPay, ZaloPay).</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Payment.AmountVnd">
+            <summary>Transaction amount in VND.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Payment.PaymentStatus">
+            <summary>Authorization outcome.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Payment.GatewayReference">
+            <summary>External gateway transaction reference.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Payment.MaskedDetail">
+            <summary>PCI-safe masked token or QR payload metadata (never raw card PAN/CVV).</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Payment.ProcessedAt">
+            <summary>Timestamp when processed.</summary>
+        </member>
+        <member name="M:TvmDemo.Models.Payment.BuildPaymentInstruction(System.String)">
+            <summary>Builds the display payload or reader prompt metadata prior to gateway submission.</summary>
+        </member>
+        <member name="T:TvmDemo.Models.CardPayment">
+            <summary>
+            Represents an EMV chip or NFC contactless bank card payment.
+            Never stores raw PAN or CVV; stores only a masked token.
+            </summary>
+        </member>
+        <member name="P:TvmDemo.Models.CardPayment.PaymentType">
+            <inheritdoc />
+        </member>
+        <member name="P:TvmDemo.Models.CardPayment.EntryMode">
+            <summary>Card entry method ("NFC-TAP" or "EMV-CHIP").</summary>
+        </member>
+        <member name="P:TvmDemo.Models.CardPayment.MaskedPan">
+            <summary>Masked last-4 card digits from P2PE reader token.</summary>
+        </member>
+        <member name="M:TvmDemo.Models.CardPayment.BuildPaymentInstruction(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="T:TvmDemo.Models.QRPayment">
+            <summary>
+            Represents an interbank dynamic QR code payment (Napas 24/7 VietQR).
+            </summary>
+        </member>
+        <member name="P:TvmDemo.Models.QRPayment.PaymentType">
+            <inheritdoc />
+        </member>
+        <member name="P:TvmDemo.Models.QRPayment.QrPayload">
+            <summary>Dynamic VietQR payload string encoded into the displayed 2D QR image.</summary>
+        </member>
+        <member name="M:TvmDemo.Models.QRPayment.BuildPaymentInstruction(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="T:TvmDemo.Models.WalletPayment">
+            <summary>
+            Represents a Digital Wallet QR payment (MoMo, VNPay, or ZaloPay).
+            </summary>
+        </member>
+        <member name="P:TvmDemo.Models.WalletPayment.PaymentType">
+            <inheritdoc />
+        </member>
+        <member name="P:TvmDemo.Models.WalletPayment.WalletQrPayload">
+            <summary>Dynamic wallet deep-link / QR content scanned by the passenger's phone.</summary>
+        </member>
+        <member name="M:TvmDemo.Models.WalletPayment.BuildPaymentInstruction(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="T:TvmDemo.Models.Ticket">
+            <summary>
+            Domain entity representing an issued paper ticket with a printed barcode.
+            Maps to <c>dbo.Ticket</c>.
+            </summary>
+        </member>
+        <member name="P:TvmDemo.Models.Ticket.TicketId">
+            <summary>Database primary key.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Ticket.TransactionId">
+            <summary>Foreign key to parent <see cref="T:TvmDemo.Models.Transaction"/>.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Ticket.TicketNumber">
+            <summary>Unique human-readable ticket serial number (e.g., TKT-20261029-143012-1).</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Ticket.BarcodeValue">
+            <summary>Encoded 1D barcode payload printed on the ticket (e.g., M1|BT|M1-14|20261029|A1B2C3).</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Ticket.PassengerSeq">
+            <summary>Sequence index within the transaction (1..Quantity).</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Ticket.OriginStation">
+            <summary>Origin station label.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Ticket.IssuedAt">
+            <summary>Timestamp when the ticket was issued.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Ticket.ValidUntil">
+            <summary>Expiration timestamp (valid for 24 hours on date of issue).</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Ticket.IsPrinted">
+            <summary>Indicates whether the physical thermal print job completed cleanly.</summary>
+        </member>
+        <member name="T:TvmDemo.Models.TvmState">
+            <summary>
+            Represents the operational state of the Ticket Vendor Machine (aligned with M3's State Chart Diagram).
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Models.TicketVendorMachine">
+            <summary>
+            Domain entity representing the physical Ticket Vendor Machine (TVM) kiosk unit.
+            Tracks operational state, origin station, paper inventory, and database link health.
+            </summary>
+        </member>
+        <member name="P:TvmDemo.Models.TicketVendorMachine.MachineCode">
+            <summary>Gets or sets the unique kiosk identifier (e.g., TVM-BT-01).</summary>
+        </member>
+        <member name="P:TvmDemo.Models.TicketVendorMachine.OriginStationEn">
+            <summary>Gets or sets the English name of the station where this TVM is installed.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.TicketVendorMachine.OriginStationVi">
+            <summary>Gets or sets the Vietnamese name of the station where this TVM is installed.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.TicketVendorMachine.CurrentState">
+            <summary>Gets the current state-machine status of the kiosk.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.TicketVendorMachine.RemainingPaperSheets">
+            <summary>Gets or sets the remaining thermal paper tickets before Out-of-Service lock.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.TicketVendorMachine.IsDatabaseOnline">
+            <summary>Gets or sets whether the SQL Server repository is currently reachable.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.TicketVendorMachine.OutOfServiceReason">
+            <summary>Gets or sets the diagnostic error code/reason when the machine enters OutOfService.</summary>
+        </member>
+        <member name="M:TvmDemo.Models.TicketVendorMachine.TransitionTo(TvmDemo.Models.TvmState,System.String)">
+            <summary>
+            Transitions the kiosk to a new operational state.
+            </summary>
+            <param name="nextState">Target <see cref="T:TvmDemo.Models.TvmState"/>.</param>
+            <param name="reason">Optional diagnostic message if transitioning to OutOfService or Failed.</param>
+        </member>
+        <member name="M:TvmDemo.Models.TicketVendorMachine.CanAcceptTransaction(System.Int32,System.String@)">
+            <summary>
+            Performs a pre-transaction hardware and connectivity readiness check.
+            </summary>
+            <param name="requiredTickets">Number of paper tickets needed (1-5).</param>
+            <param name="faultReason">Outputs a human-readable fault message if not operational.</param>
+            <returns><c>true</c> if the TVM can accept a purchase; otherwise <c>false</c>.</returns>
+        </member>
+        <member name="T:TvmDemo.Models.TransactionStatus">
+            <summary>
+            Persistence lifecycle status of a ticket purchase transaction in <c>dbo.[Transaction]</c>.
+            Matches the SQL Server CHECK constraint ('Pending', 'Completed', 'Failed', 'Cancelled').
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Models.PaymentModeType">
+            <summary>
+            Supported high-level payment modes matching <c>dbo.[Transaction].PaymentMode</c>.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Models.Transaction">
+            <summary>
+            Domain entity representing a TVM ticket purchase transaction.
+            Maps to <c>dbo.[Transaction]</c>.
+            </summary>
+        </member>
+        <member name="P:TvmDemo.Models.Transaction.TransactionId">
+            <summary>Database primary key.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Transaction.TransactionCode">
+            <summary>Human-readable unique reference code (e.g., TXN-20261029-143012).</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Transaction.MachineCode">
+            <summary>Kiosk machine identifier (e.g., TVM-BT-01).</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Transaction.DestinationId">
+            <summary>Foreign key to <see cref="P:TvmDemo.Models.Transaction.Destination"/>.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Transaction.Destination">
+            <summary>Navigation reference to selected <see cref="P:TvmDemo.Models.Transaction.Destination"/>.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Transaction.Quantity">
+            <summary>Number of tickets purchased (1–5).</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Transaction.UnitFareVnd">
+            <summary>Unit fare at the time of purchase in VND.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Transaction.TotalAmountVnd">
+            <summary>Total payable amount in VND (<c>Quantity * UnitFareVnd</c>).</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Transaction.PaymentMode">
+            <summary>Selected payment mode.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Transaction.Status">
+            <summary>Current transaction lifecycle state.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Transaction.FailureReason">
+            <summary>Optional failure or cancellation diagnostic note.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Transaction.CreatedAt">
+            <summary>Creation timestamp.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Transaction.UpdatedAt">
+            <summary>Last status update timestamp.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Transaction.Payment">
+            <summary>Associated payment attempt.</summary>
+        </member>
+        <member name="P:TvmDemo.Models.Transaction.Tickets">
+            <summary>Issued tickets (populated only when <see cref="P:TvmDemo.Models.Transaction.Status"/> is <see cref="F:TvmDemo.Models.TransactionStatus.Completed"/>).</summary>
+        </member>
+        <member name="T:TvmDemo.Models.TransactionReportRow">
+            <summary>
+            Read-model DTO representing a joined row from <c>dbo.vw_TransactionReport</c> / <c>dbo.usp_GetRecentTransactions</c>.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Program">
+            <summary>
+            Application entry point wiring MVC dependencies (<see cref="T:TvmDemo.Models.TicketVendorMachine"/>,
+            <see cref="T:TvmDemo.Data.SqlTvmRepository"/>, <see cref="T:TvmDemo.Services.MockPaymentGateway"/>, <see cref="T:TvmDemo.Services.PaymentService"/>,
+            <see cref="T:TvmDemo.Services.TicketPrinter"/>, <see cref="T:TvmDemo.Controllers.TicketController"/>, and <see cref="T:TvmDemo.Views.MainForm"/>).
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Services.GatewaySimulationMode">
+            <summary>
+            Controls the deterministic result returned by <see cref="T:TvmDemo.Services.MockPaymentGateway"/> during demo runs.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Services.GatewayResponse">
+            <summary>
+            Value object representing the outcome of an external payment gateway authorization or callback wait.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Services.GatewayResponse.#ctor(TvmDemo.Models.PaymentResultStatus,System.String,System.String,System.String)">
+            <summary>
+            Value object representing the outcome of an external payment gateway authorization or callback wait.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Services.IPaymentGateway">
+            <summary>
+            Abstraction for external card acquirer and QR/Wallet payment gateways.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Services.IPaymentGateway.AuthorizeAsync(TvmDemo.Models.Payment,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Authorizes a card tap or awaits a signed QR/Wallet gateway callback asynchronously.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Services.PaymentGateway">
+            <summary>
+            Shared team base class <c>PaymentGateway</c> (aligns with M3's Class &amp; Sequence Diagrams)
+            implementing <see cref="T:TvmDemo.Services.IPaymentGateway"/>.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Services.PaymentGateway.AuthorizeAsync(TvmDemo.Models.Payment,System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:TvmDemo.Services.MockPaymentGateway">
+            <summary>
+            Simulated payment gateway used in the local desktop prototype (replaces live Visa/MoMo/VNPay/ZaloPay calls).
+            Provides a switchable outcome (<see cref="F:TvmDemo.Services.GatewaySimulationMode.Success"/>,
+            <see cref="F:TvmDemo.Services.GatewaySimulationMode.Declined"/>, <see cref="F:TvmDemo.Services.GatewaySimulationMode.Timeout"/>)
+            with non-blocking asynchronous network latency simulation.
+            </summary>
+        </member>
+        <member name="P:TvmDemo.Services.MockPaymentGateway.SimulationMode">
+            <summary>Gets or sets the simulated result switch controlled from the demo toolbar.</summary>
+        </member>
+        <member name="P:TvmDemo.Services.MockPaymentGateway.SimulatedDelayMs">
+            <summary>Gets or sets simulated network/callback latency in milliseconds (default 2,400 ms).</summary>
+        </member>
+        <member name="M:TvmDemo.Services.MockPaymentGateway.AuthorizeAsync(TvmDemo.Models.Payment,System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:TvmDemo.Services.PaymentService">
+            <summary>
+            Domain application service orchestrating payment instrument creation and gateway authorization.
+            Matches the shared class name <c>PaymentService</c> in M3's Sequence, Class, and Deployment diagrams.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Services.PaymentService.#ctor(TvmDemo.Services.IPaymentGateway)">
+            <summary>
+            Initializes a new instance of <see cref="T:TvmDemo.Services.PaymentService"/>.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Services.PaymentService.CreatePayment(TvmDemo.Models.Transaction,System.String)">
+            <summary>
+            Factory method creating the concrete <see cref="T:TvmDemo.Models.Payment"/> subclass for a transaction.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Services.PaymentService.ProcessPaymentAsync(TvmDemo.Models.Transaction,TvmDemo.Models.Payment,System.Threading.CancellationToken)">
+            <summary>
+            Executes payment authorization via <see cref="T:TvmDemo.Services.IPaymentGateway"/> and updates the <see cref="T:TvmDemo.Models.Payment"/> entity.
+            Handles user cancellation cleanly via <paramref name="cancellationToken"/>.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Services.PrintTicketResult">
+            <summary>
+            Result returned by <see cref="T:TvmDemo.Services.TicketPrinter"/> after attempting to print paper tickets.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Services.PrintTicketResult.#ctor(System.Boolean,System.Collections.Generic.List{TvmDemo.Models.Ticket},System.String)">
+            <summary>
+            Result returned by <see cref="T:TvmDemo.Services.TicketPrinter"/> after attempting to print paper tickets.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Services.TicketPrinter">
+            <summary>
+            Hardware abstraction and simulator for the kiosk ESC/POS thermal receipt and barcode printer.
+            Matches the shared class name <c>TicketPrinter</c>.
+            </summary>
+        </member>
+        <member name="P:TvmDemo.Services.TicketPrinter.SimulateHardwareFault">
+            <summary>Gets or sets a demo toggle to simulate an unexpected thermal printer jam / paper-out fault.</summary>
+        </member>
+        <member name="M:TvmDemo.Services.TicketPrinter.PrintTickets(TvmDemo.Models.Transaction,TvmDemo.Models.TicketVendorMachine)">
+            <summary>
+            Generates and simulates printing paper tickets with unique 1D barcode strings for a confirmed transaction.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Services.TicketPrinter.RenderBarcodeBitmap(System.String,System.Int32,System.Int32)">
+            <summary>
+            Renders a crisp 1D linear barcode bitmap via GDI+ from a ticket barcode string.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Services.TicketPrinter.RenderQrBitmap(System.String,System.Int32)">
+            <summary>
+            Renders a deterministic 21x21 QR-like 2D matrix bitmap via GDI+ for screen S04b.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Views.KioskTheme">
+            <summary>
+            Centralized UI design tokens matching the Figma / HTML glassmorphism specification (Task 1).
+            Uses <see cref="F:System.Drawing.GraphicsUnit.Pixel"/> fonts so typography scales identically with pixel bounds at any Windows DPI.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Views.IKioskSurface">
+            <summary>
+            Implemented by custom kiosk surfaces capable of painting an exact translated background slice
+            into child controls, eliminating WinForms <c>Color.Transparent</c> corner/buffer artifacts.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Views.IPassThroughContainer">
+            <summary>
+            Marker interface for layout wrapper containers that delegate background painting to their ancestor <see cref="T:TvmDemo.Views.IKioskSurface"/>.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Views.KioskSurfaceHelper">
+            <summary>
+            Deterministic background compositor for nested WinForms controls.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Views.GradientBackdropPanel">
+            <summary>
+            Double-buffered root canvas rendering the deep-blue-to-teal gradient and ambient station bokeh orbs.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Views.HeaderBarPanel">
+            <summary>
+            Persistent top utility header bar with clean gradient rendering and zero child transparency artifacts.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Views.ScreenPanel">
+            <summary>
+            Flicker-free layout host panel that delegates background painting directly to the ancestor kiosk surface.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Views.GlassGridPanel">
+            <summary>
+            Double-buffered <see cref="T:System.Windows.Forms.TableLayoutPanel"/> that delegates background painting cleanly to its parent <see cref="T:TvmDemo.Views.GlassPanel"/>.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Views.GlassPanel">
+            <summary>
+            Translucent frosted-glass card panel simulating CSS <c>backdrop-filter: blur()</c> in WinForms GDI+
+            while providing exact translated surface slices to child controls.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Views.KioskLabel">
+            <summary>
+            Artifact-free text, badge, and banner control that always preserves <c>&amp;</c> characters (<c>NoPrefix</c>)
+            and supports smooth rounded pill/banner fills over glass or gradient surfaces.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Views.KioskButtonVariant">
+            <summary>
+            Button visual variants aligned with Task 1 design tokens.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Views.KioskButton">
+            <summary>
+            Large-target rounded touchscreen button with pressed, hover, selected, and disabled states.
+            Paints its parent's exact surface slice first to prevent corner/VRAM artifacts.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Views.StepProgressControl">
+            <summary>
+            4-step kiosk progress bar: (1) Destination, (2) Payment, (3) Pay, (4) Ticket.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Views.BufferedDataGridView">
+            <summary>
+            Double-buffered <see cref="T:System.Windows.Forms.DataGridView"/> for smooth, flicker-free transaction report rendering.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Views.MainForm">
+            <summary>
+            Main 1280x800 touchscreen kiosk View (MVC View layer) hosting screens S01 through S08
+            and a docked Instructor Simulation Strip for switching <see cref="T:TvmDemo.Services.MockPaymentGateway"/> modes
+            and SQL Server connection profiles during live grading demonstrations.
+            Automatically scales proportionally to fit smaller or High-DPI laptop displays without clipping.
+            </summary>
+        </member>
+        <member name="M:TvmDemo.Views.MainForm.NavigateTo(System.String)">
+            <summary>
+            Navigates to the specified screen identifier (<c>S01</c> through <c>S08</c>) and updates the 4-step progress bar.
+            </summary>
+        </member>
+        <member name="T:TvmDemo.Views.TransactionReportForm">
+            <summary>
+            Output Report window displaying a <see cref="T:System.Windows.Forms.DataGridView"/> of recent TVM transactions
+            joined across <c>dbo.[Transaction]</c>, <c>dbo.Destination</c>, <c>dbo.Payment</c>, and <c>dbo.Ticket</c>.
+            </summary>
+        </member>
+        <member name="T:SmartTicketing.TVM.SimulatedGatewayAdapterBase">
+            <summary>
+            Shared mock simulation base realizing <see cref="T:SmartTicketing.TVM.IPaymentGateway"/> for the 5 concrete gateway adapters
+            in Member M3's Class Diagram 2/2 (CardAcquirerAdapter, VietQRAdapter, MomoAdapter, ZaloPayAdapter, VNPayAdapter).
+            </summary>
+        </member>
+        <member name="T:ApplicationConfiguration">
+            <summary>
+             Bootstrap the application configuration.
+            </summary>
+        </member>
+        <member name="M:ApplicationConfiguration.Initialize">
+            <summary>
+             Bootstrap the application as follows:
+             <code>
+             global::System.Windows.Forms.Application.EnableVisualStyles();
+             global::System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
+             global::System.Windows.Forms.Application.SetHighDpiMode(HighDpiMode.SystemAware);
+            </code>
+            </summary>
+        </member>
+    </members>
+</doc>

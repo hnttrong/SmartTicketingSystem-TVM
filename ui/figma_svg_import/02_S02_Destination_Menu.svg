@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800">
+  <title>02_S02_Destination_Menu</title>
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#003E7E"/>
+      <stop offset="55%" stop-color="#0267A6"/>
+      <stop offset="100%" stop-color="#00A8B5"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#001833" flood-opacity="0.18"/>
+    </filter>
+    </defs>
+  <rect id="Background" width="1280" height="800" fill="url(#bgGrad)"/>
+  
+    <circle id="Decor_TopRight" cx="1090" cy="40" r="210" fill="#FFFFFF" fill-opacity="0.06"/>
+    <circle id="Decor_BottomLeft" cx="140" cy="670" r="240" fill="#FFFFFF" fill-opacity="0.06"/>
+    
+
+  <!-- Header Bar R(0, 0, 1280, 84) in MainForm.cs -->
+  <g id="Top_Header_Bar">
+    <rect x="0" y="0" width="1280" height="84" fill="#06234B" fill-opacity="0.78"/>
+    <line x1="0" y1="83" x2="1280" y2="83" stroke="#FFFFFF" stroke-opacity="0.22" stroke-width="1"/>
+    <g id="Metro_Badge">
+      <rect x="28" y="14" width="56" height="56" rx="14" fill="#00A8B5"/>
+      <text x="56" y="49" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700" fill="#FFFFFF" text-anchor="middle">M1</text>
+    </g>
+    <text id="Header_Title" x="100" y="38" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="700" fill="#FFFFFF">Giao thông Thông minh TP.HCM • Tuyến Metro Số 1</text>
+    <text id="Header_Subtitle" x="100" y="64" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="600" fill="#C8EBFA">Ga đi: Bến Thành • Máy bán vé tự động TVM-BT-01</text>
+    <g id="Btn_Language_Toggle">
+      <rect x="824" y="10" width="170" height="64" rx="14" fill="#FFFFFF" fill-opacity="0.16" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="2"/>
+      <text x="909" y="48" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">🌐 VI / EN</text>
+    </g>
+    <g id="Btn_Accessibility_Toggle">
+      <rect x="1008" y="10" width="244" height="64" rx="14" fill="#FFFFFF" fill-opacity="0.16" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="2"/>
+      <text x="1130" y="48" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle">♿ Chữ lớn / Tương phản</text>
+    </g>
+  </g>
+
+  <!-- StepProgressBar R(28, 94, 1224, 58) in MainForm.cs -->
+  <g id="Progress_Stepper_Bar">
+    <rect x="28" y="94" width="1224" height="58" rx="14" fill="#FFFFFF" fill-opacity="0.86" stroke="#FFFFFF" stroke-width="1.5"/>
+    <g id="Step_1">
+      <circle cx="65" cy="123" r="15" fill="#0A4988"/>
+      <text x="65" y="128" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">1</text>
+      <text x="90" y="129" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#0A4988">1. Điểm đến</text>
+    </g>
+    <line x1="296" y1="123" x2="326" y2="123" stroke="#C3D0E0" stroke-width="2"/>
+    <g id="Step_2">
+      <circle cx="371" cy="123" r="15" fill="#DCE4F0"/>
+      <text x="371" y="128" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#4E6178" text-anchor="middle">2</text>
+      <text x="396" y="129" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#4E6178">2. Phương thức</text>
+    </g>
+    <line x1="602" y1="123" x2="632" y2="123" stroke="#C3D0E0" stroke-width="2"/>
+    <g id="Step_3">
+      <circle cx="677" cy="123" r="15" fill="#DCE4F0"/>
+      <text x="677" y="128" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#4E6178" text-anchor="middle">3</text>
+      <text x="702" y="129" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#4E6178">3. Thanh toán</text>
+    </g>
+    <line x1="908" y1="123" x2="938" y2="123" stroke="#C3D0E0" stroke-width="2"/>
+    <g id="Step_4">
+      <circle cx="983" cy="123" r="15" fill="#DCE4F0"/>
+      <text x="983" y="128" font-family="Segoe UI, Arial, sans-serif" font-size="13" font-weight="700" fill="#4E6178" text-anchor="middle">4</text>
+      <text x="1008" y="129" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#4E6178">4. Nhận vé</text>
+    </g>
+  </g>
+  <rect id="S02_Main_Card" x="28" y="162" width="1224" height="536" rx="22" fill="#FFFFFF" fill-opacity="0.86" stroke="#FFFFFF" stroke-width="1.5" filter="url(#cardShadow)"/>
+
+  <!-- Title & Quantity Stepper inside S02_Main_Card -->
+  <text id="S02_Title" x="56" y="212" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="700" fill="#0F223D">Chọn Ga đến &amp; Số lượng vé</text>
+  <text id="S02_Qty_Caption" x="850" y="211" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F223D" text-anchor="end">Số lượng vé (1–5):</text>
+  <g id="Btn_S02_Qty_Minus">
+    <rect x="856" y="174" width="72" height="64" rx="14" fill="#FFFFFF" stroke="#8FA8C8" stroke-width="2"/>
+    <text x="892" y="215" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#0F223D" text-anchor="middle">−</text>
+  </g>
+  <g id="S02_Qty_Value_Box">
+    <rect x="936" y="176" width="84" height="60" rx="10" fill="#EEF4FB"/>
+    <text x="978" y="216" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#0A4988" text-anchor="middle">2</text>
+  </g>
+  <g id="Btn_S02_Qty_Plus">
+    <rect x="1028" y="174" width="72" height="64" rx="14" fill="#FFFFFF" stroke="#8FA8C8" stroke-width="2"/>
+    <text x="1064" y="215" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#0F223D" text-anchor="middle">+</text>
+  </g>
+  <g id="Station_Card_01">
+    <rect x="52" y="244" width="282" height="134" rx="16" fill="#FFFFFF" stroke="#8FA8C8" stroke-width="2"/>
+    <text x="193" y="300" font-family="Segoe UI, Arial, sans-serif" font-size="16.5" font-weight="700" fill="#0F223D" text-anchor="middle">[MRT] Nhà hát Thành phố</text>
+    <text x="193" y="332" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#4E6178" text-anchor="middle">7,000 VND</text>
+  </g>
+  <g id="Station_Card_02">
+    <rect x="350" y="244" width="282" height="134" rx="16" fill="#FFFFFF" stroke="#8FA8C8" stroke-width="2"/>
+    <text x="491" y="300" font-family="Segoe UI, Arial, sans-serif" font-size="16.5" font-weight="700" fill="#0F223D" text-anchor="middle">[MRT] Ba Son</text>
+    <text x="491" y="332" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#4E6178" text-anchor="middle">8,000 VND</text>
+  </g>
+  <g id="Station_Card_03">
+    <rect x="648" y="244" width="282" height="134" rx="16" fill="#FFFFFF" stroke="#8FA8C8" stroke-width="2"/>
+    <text x="789" y="300" font-family="Segoe UI, Arial, sans-serif" font-size="16.5" font-weight="700" fill="#0F223D" text-anchor="middle">[MRT] Công viên Văn Thánh</text>
+    <text x="789" y="332" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#4E6178" text-anchor="middle">9,000 VND</text>
+  </g>
+  <g id="Station_Card_04">
+    <rect x="946" y="244" width="282" height="134" rx="16" fill="#FFFFFF" stroke="#8FA8C8" stroke-width="2"/>
+    <text x="1087" y="300" font-family="Segoe UI, Arial, sans-serif" font-size="16.5" font-weight="700" fill="#0F223D" text-anchor="middle">[MRT] Tân Cảng</text>
+    <text x="1087" y="332" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#4E6178" text-anchor="middle">10,000 VND</text>
+  </g>
+  <g id="Station_Card_05">
+    <rect x="52" y="392" width="282" height="134" rx="16" fill="#FFFFFF" stroke="#8FA8C8" stroke-width="2"/>
+    <text x="193" y="448" font-family="Segoe UI, Arial, sans-serif" font-size="16.5" font-weight="700" fill="#0F223D" text-anchor="middle">[MRT] Thảo Điền</text>
+    <text x="193" y="480" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#4E6178" text-anchor="middle">11,000 VND</text>
+  </g>
+  <g id="Station_Card_06">
+    <rect x="350" y="392" width="282" height="134" rx="16" fill="#FFFFFF" stroke="#8FA8C8" stroke-width="2"/>
+    <text x="491" y="448" font-family="Segoe UI, Arial, sans-serif" font-size="16.5" font-weight="700" fill="#0F223D" text-anchor="middle">[MRT] An Phú</text>
+    <text x="491" y="480" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#4E6178" text-anchor="middle">12,000 VND</text>
+  </g>
+  <g id="Station_Card_07">
+    <rect x="648" y="392" width="282" height="134" rx="16" fill="#FFFFFF" stroke="#8FA8C8" stroke-width="2"/>
+    <text x="789" y="448" font-family="Segoe UI, Arial, sans-serif" font-size="16.5" font-weight="700" fill="#0F223D" text-anchor="middle">[MRT] Phước Long</text>
+    <text x="789" y="480" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#4E6178" text-anchor="middle">15,000 VND</text>
+  </g>
+  <g id="Station_Card_08">
+    <rect x="946" y="392" width="282" height="134" rx="16" fill="#FFFFFF" stroke="#8FA8C8" stroke-width="2"/>
+    <text x="1087" y="448" font-family="Segoe UI, Arial, sans-serif" font-size="16.5" font-weight="700" fill="#0F223D" text-anchor="middle">[MRT] Thủ Đức</text>
+    <text x="1087" y="480" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#4E6178" text-anchor="middle">18,000 VND</text>
+  </g>
+  <g id="Station_Card_09">
+    <rect x="52" y="540" width="282" height="134" rx="16" fill="#FFFFFF" stroke="#8FA8C8" stroke-width="2"/>
+    <text x="193" y="596" font-family="Segoe UI, Arial, sans-serif" font-size="16.5" font-weight="700" fill="#0F223D" text-anchor="middle">[MRT] Khu Công nghệ cao</text>
+    <text x="193" y="628" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#4E6178" text-anchor="middle">19,000 VND</text>
+  </g>
+  <g id="Station_Card_10">
+    <rect x="350" y="540" width="282" height="134" rx="16" fill="#0A4988" stroke="#0A4988" stroke-width="2"/>
+    <text x="491" y="596" font-family="Segoe UI, Arial, sans-serif" font-size="16.5" font-weight="700" fill="#FFFFFF" text-anchor="middle">[MRT] Bến xe Suối Tiên</text>
+    <text x="491" y="628" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#E0F2FE" text-anchor="middle">20,000 VND</text>
+  </g>
+  <g id="Station_Card_11">
+    <rect x="648" y="540" width="282" height="134" rx="16" fill="#FFFFFF" stroke="#8FA8C8" stroke-width="2"/>
+    <text x="789" y="596" font-family="Segoe UI, Arial, sans-serif" font-size="16.5" font-weight="700" fill="#0F223D" text-anchor="middle">[BUS] BX Chợ Lớn (Bus 01)</text>
+    <text x="789" y="628" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#4E6178" text-anchor="middle">6,000 VND</text>
+  </g>
+  <g id="Station_Card_12">
+    <rect x="946" y="540" width="282" height="134" rx="16" fill="#FFFFFF" stroke="#8FA8C8" stroke-width="2"/>
+    <text x="1087" y="596" font-family="Segoe UI, Arial, sans-serif" font-size="16.5" font-weight="700" fill="#0F223D" text-anchor="middle">[BUS] Sân bay TSN (Bus 109)</text>
+    <text x="1087" y="628" font-family="Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#4E6178" text-anchor="middle">15,000 VND</text>
+  </g>
+  <g id="Btn_S02_Cancel">
+    <rect x="28" y="712" width="240" height="70" rx="16" fill="#FFF5F5" stroke="#C2272D" stroke-width="2"/>
+    <text x="148" y="754" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700" fill="#C2272D" text-anchor="middle">✕ Hủy giao dịch</text>
+  </g>
+  <rect id="S02_Bottom_Summary_Card" x="284" y="710" width="590" height="72" rx="16" fill="#FFFFFF" fill-opacity="0.86" stroke="#FFFFFF" stroke-width="1.5" filter="url(#cardShadow)"/>
+  <text id="S02_Bottom_Summary_Text" x="302" y="754" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#0A4988">Bến xe Suối Tiên × 2 vé = 40,000 VND</text>
+  <g id="Btn_S02_Next_Select_Payment">
+    <rect x="892" y="712" width="360" height="70" rx="16" fill="#0A4988" stroke="#0A4988" stroke-width="0"/>
+    <text x="1072" y="754" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF" text-anchor="middle">Chọn Thanh toán  →</text>
+  </g>
+</svg>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="800" viewBox="0 0 1280 800">
+  <title>00_Design_Tokens_and_Components</title>
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#003E7E"/>
+      <stop offset="55%" stop-color="#0267A6"/>
+      <stop offset="100%" stop-color="#00A8B5"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#001833" flood-opacity="0.18"/>
+    </filter>
+    </defs>
+  <rect id="Background" width="1280" height="800" fill="url(#bgGrad)"/>
+  
+    <circle id="Decor_TopRight" cx="1090" cy="40" r="210" fill="#FFFFFF" fill-opacity="0.06"/>
+    <circle id="Decor_BottomLeft" cx="140" cy="670" r="240" fill="#FFFFFF" fill-opacity="0.06"/>
+    
+
+  <rect id="Tokens_Board" x="28" y="24" width="1224" height="752" rx="22" fill="#FFFFFF" fill-opacity="0.95"/>
+  <rect x="28" y="24" width="1224" height="74" rx="22" fill="#06234B"/>
+  <text x="60" y="70" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="700" fill="#FFFFFF">TVM Kiosk UI/UX — Design Tokens &amp; Component Variants (Matched 1:1 with MainForm.cs)</text>
+
+  <text x="60" y="138" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#0F223D">1. Color &amp; Glassmorphism Surface Tokens (WCAG AA &gt;= 4.5:1)</text>
+  <g id="Swatches">
+    <rect x="60" y="156" width="175" height="90" rx="14" fill="#0A4988"/>
+    <text x="147" y="198" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">Primary Blue</text>
+    <text x="147" y="222" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#C8EBFA" text-anchor="middle">#0A4988 (CTA / Active)</text>
+
+    <rect x="250" y="156" width="175" height="90" rx="14" fill="#00A8B5"/>
+    <text x="337" y="198" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">Metro Teal</text>
+    <text x="337" y="222" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#FFFFFF" text-anchor="middle">#00A8B5 (Gradient)</text>
+
+    <rect x="440" y="156" width="175" height="90" rx="14" fill="#FFFFFF" stroke="#8FA8C8" stroke-width="2"/>
+    <text x="527" y="198" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#0F223D" text-anchor="middle">Frosted Glass 86%</text>
+    <text x="527" y="222" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#4E6178" text-anchor="middle">rgba(255,255,255,0.86)</text>
+
+    <rect x="630" y="156" width="175" height="90" rx="14" fill="#0F223D"/>
+    <text x="717" y="198" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">Text Navy #0F223D</text>
+    <text x="717" y="222" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#C8EBFA" text-anchor="middle">Contrast 12.6 : 1</text>
+
+    <rect x="820" y="156" width="175" height="90" rx="14" fill="#1B7F3B"/>
+    <text x="907" y="198" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">Success #1B7F3B</text>
+    <text x="907" y="222" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#E8F8EE" text-anchor="middle">Safe Refund / Issued</text>
+
+    <rect x="1010" y="156" width="175" height="90" rx="14" fill="#C2272D"/>
+    <text x="1097" y="198" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">Danger #C2272D</text>
+    <text x="1097" y="222" font-family="Segoe UI, Arial, sans-serif" font-size="13" fill="#FFF5F5" text-anchor="middle">Cancel / Error</text>
+  </g>
+
+  <text x="60" y="294" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#0F223D">2. Kiosk Typography Scale &amp; Touch Target Rules (Views/MainForm.cs)</text>
+  <rect x="60" y="310" width="1125" height="190" rx="16" fill="#F4F8FC" stroke="#C5D5E8" stroke-width="1.5"/>
+  <text x="88" y="362" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="700" fill="#0F223D">Screen Title — 28–36pt Bold (MainForm.cs)</text>
+  <text x="88" y="408" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="700" fill="#0A4988">Section Heading / Total Payable — 22–28pt Bold</text>
+  <text x="88" y="448" font-family="Segoe UI, Arial, sans-serif" font-size="17" fill="#4E6178">Body Copy &amp; Instructions — 16–18pt Regular/Semibold • Touch Target Height = 64–78 px • Grid Gutter = 14–18 px</text>
+  <text x="88" y="480" font-family="Consolas, monospace" font-size="15" font-weight="700" fill="#0F223D">Ticket Barcode &amp; Joined DB Report — Consolas 11–13pt Bold • 16-digit Luhn TicketNumber (DR4)</text>
+
+  <text x="60" y="544" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#0F223D">3. Kiosk Button Variants in MainForm.cs (Height &gt;= 64 px)</text>
+  <g id="Token_Btn_Primary">
+    <rect x="60" y="566" width="210" height="68" rx="16" fill="#0A4988" stroke="#0A4988" stroke-width="0"/>
+    <text x="165" y="607" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="middle">Primary CTA</text>
+  </g>
+  <g id="Token_Btn_Secondary">
+    <rect x="288" y="566" width="210" height="68" rx="16" fill="#FFFFFF" stroke="#8FA8C8" stroke-width="2"/>
+    <text x="393" y="607" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F223D" text-anchor="middle">Secondary Glass</text>
+  </g>
+  <g id="Token_Btn_Success">
+    <rect x="516" y="566" width="210" height="68" rx="16" fill="#1B7F3B" stroke="#1B7F3B" stroke-width="0"/>
+    <text x="621" y="607" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="middle">✓ Success CTA</text>
+  </g>
+  <g id="Token_Btn_DangerOutline">
+    <rect x="744" y="566" width="210" height="68" rx="16" fill="#FFF5F5" stroke="#C2272D" stroke-width="2"/>
+    <text x="849" y="607" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700" fill="#C2272D" text-anchor="middle">✕ Cancel Outline</text>
+  </g>
+  <g id="Token_Btn_DangerSolid">
+    <rect x="972" y="566" width="210" height="68" rx="16" fill="#C2272D" stroke="#C2272D" stroke-width="0"/>
+    <text x="1077" y="607" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="middle">✕ Danger Solid</text>
+  </g>
+</svg>
